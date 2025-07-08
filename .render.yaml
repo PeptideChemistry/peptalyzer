@@ -4,10 +4,7 @@ services:
     env: python
     region: oregon
     plan: free
-    buildCommand: |
-      pip install -r requirements.txt
-      python rpm2cpio.py tmp/wkhtmltox.rpm tmp/
-      cp tmp/usr/local/bin/wkhtmltopdf bin/
+    buildCommand: "./build.sh && pip install -r requirements.txt"
     startCommand: gunicorn app:app
     envVars:
       - key: FLASK_ENV
