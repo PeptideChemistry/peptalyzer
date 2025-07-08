@@ -1,0 +1,107 @@
+<!-- templates/report_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PeptideIQ Report</title>
+    <link rel="stylesheet" href="{{ request.host_url }}static/css/report_style.css">
+    <style>
+        body { font-family: 'Roboto', sans-serif; margin: 20px; }
+        header, footer { text-align: center; margin-bottom: 20px; }
+        h1 { color: #1e90ff; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        table, th, td { border: 1px solid #ddd; }
+        th, td { padding: 8px; text-align: left; }
+        .section-title { margin-top: 30px; font-size: 22px; }
+        img { display: block; margin: 20px auto; max-width: 100%; }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <img src="{{ request.host_url }}static/icons/PeptideChemistry_Logo.svg" alt="Peptide Chemistry Logo" style="height: 60px;">
+    <h1>PeptideIQ Report</h1>
+    <p><a href="https://peptidechemistry.org" style="color: #1e90ff;">peptidechemistry.org</a></p>
+    <p><strong>Report Date:</strong> {{ data.timestamp }}</p>
+</header>
+
+<section>
+    <h2 class="section-title">Peptide Sequence</h2>
+    <p style="font-size: 18px;"><strong>Sequence:</strong> {{ data.sequence }}</p>
+    <p><strong>Terminus:</strong> {{ data.terminal_modifications }}</p>
+</section>
+
+<section>
+    <h2 class="section-title">Basic Properties</h2>
+    <table>
+        <tbody>
+            <tr><td>Peptide Length</td><td>{{ data.length }}</td></tr>
+            <tr><td>Isoelectric Point (pI)</td><td>{{ data.isoelectric_point }}</td></tr>
+            <tr><td>Net Charge at Selected pH</td><td>{{ data.charge_at_pH }}</td></tr>
+            <tr><td>GRAVY Score</td><td>{{ data.gravy_value }} ({{ data.gravy_classification }})</td></tr>
+            <tr><td>Peptide Polarity</td><td>{{ data.peptide_polarity }}</td></tr>
+            <tr><td>Molecular Formula</td><td>{{ data.molecular_formula.formatted }}</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2 class="section-title">Molecular and Structural Characteristics</h2>
+    <table>
+        <tbody>
+            <tr><td>Monoisotopic Mw</td><td>{{ data.monoisotopic_mw }} Da</td></tr>
+            <tr><td>Average Mw</td><td>{{ data.average_mw }} Da</td></tr>
+            <tr><td>Intramolecular SS Bonds</td><td>{{ data.intra_disulfide_bonds }}</td></tr>
+            <tr><td>Intermolecular SS Bonds</td><td>{{ data.inter_disulfide_bonds }}</td></tr>
+            <tr><td>Peptide State</td><td>{{ data.peptide_state }}</td></tr>
+            <tr><td>Extinction Coefficient</td><td>{{ data.extinction_coefficient.adjusted }} {{ data.extinction_coefficient.unit }}</td></tr>
+            <tr><td>Acidic Residues</td><td>{{ data.charge_distribution.acidic_count }}</td></tr>
+            <tr><td>Basic Residues</td><td>{{ data.charge_distribution.basic_count }}</td></tr>
+            <tr><td>Total Charged Residues</td><td>{{ data.total_charge_residues }}</td></tr>
+            <tr><td>Boman Index</td><td>{{ data.boman_index }}</td></tr>
+            <tr><td>Aliphatic Index</td><td>{{ data.aliphatic_index.value }}% ({{ data.aliphatic_index.rating }})</td></tr>
+            <tr><td>Aromaticity</td><td>{{ data.aromaticity.value }}</td></tr>
+            <tr><td>Instability Index</td><td>{{ data.instability_index.value }}</td></tr>
+            <tr><td>Helix (%)</td><td>{{ data.secondary_structure.helix }}</td></tr>
+            <tr><td>Sheet (%)</td><td>{{ data.secondary_structure.sheet }}</td></tr>
+            <tr><td>Coil (%)</td><td>{{ data.secondary_structure.coil }}</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2 class="section-title">Amino Acid Counts</h2>
+    <table>
+        <thead><tr><th>Amino Acid</th><th>Count</th></tr></thead>
+        <tbody>
+            {% for aa, count in data.amino_acid_counts.items() %}
+            <tr><td>{{ aa }}</td><td>{{ count }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2 class="section-title">Graphs</h2>
+    <h3>Net Charge vs pH</h3>
+    <img src="data:image/png;base64,{{ data.net_charge_plot }}" alt="Net Charge vs pH">
+
+    <h3>Charge Distribution Pie Chart</h3>
+    <img src="data:image/png;base64,{{ data.charge_distribution_pie }}" alt="Charge Distribution Pie Chart">
+
+    <h3>Hydropathy Profile - Kyte-Doolittle</h3>
+    <img src="data:image/png;base64,{{ data.hydropathy_plot }}" alt="Kyte-Doolittle Hydropathy">
+
+    <h3>Hydrophilicity Profile - Hopp-Woods</h3>
+    <img src="data:image/png;base64,{{ data.hopp_woods_plot }}" alt="Hopp-Woods Hydrophilicity">
+</section>
+
+<footer>
+    <p>PeptideIQ Version: 1.0.0</p>
+    <p><a href="https://peptidechemistry.org/contact/">Contact Support</a> | <a href="https://peptidechemistry.org/peptideiq/resources">Resources</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peptide Calculator - Results</title>
+
+  <!-- Meta description for search engines -->
+  <meta name="description" content="Peptide Calculator for quick peptide property predictions and visualizations.">
+  <!-- SEO keywords -->
+  <meta name="keywords" content="peptide calculator, peptide properties, peptide visualization, peptide synthesis, peptide sequence analysis, peptide tools">
+
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+  <!-- Roboto font -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Custom stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+  <!-- ===== PeptideIQ Header ===== -->
+  <div style="display: flex; justify-content: center; align-items: center; margin-top: 40px; margin-bottom: 20px; flex-direction: column;">
+      <a href="https://peptidechemistry.org/" style="display: flex; align-items: center; text-decoration: none;">
+          <img src="{{ url_for('static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Peptide Chemistry Logo" style="height: 50px; margin-right: 10px;">
+          <h1 style="font-size: 32px; color: #1e90ff; font-family: 'Roboto', sans-serif; margin: 0;">Peptide<span style="color: #333; font-weight: bold;">IQ</span></h1>
+      </a>
+      <!-- Sequence is now outside the link -->
+  </div>
+
+  <main class="main-content">
+    <div id="pdf-report-container">
+
+    <!-- ===== Sequence Input Section ===== -->
+    <!-- User inputs peptide sequence, N-terminus, C-terminus, and pH. Form triggers backend calculation. -->
+    <form id="calcForm" class="sequence-form">
+      <div class="sequence-row">
+
+        <!-- N-Terminus selection -->
+        <div class="termini-select">
+          <label for="n_term">N-Terminus</label>
+          <select id="n_term" name="n_term" aria-label="Select N-Terminus">
+            <option value="H">H- (Free Amine)</option>
+            <option value="Ac">Ac- (Acetylated)</option>
+          </select>
+        </div>
+
+        <!-- Peptide sequence input -->
+        <div class="sequence-input">
+          <label for="sequence">Peptide Sequence</label>
+          <input type="text" id="sequence" name="sequence" placeholder="Enter peptide sequence" required aria-required="true">
+        </div>
+
+        <!-- C-Terminus selection -->
+        <div class="termini-select">
+          <label for="c_term">C-Terminus</label>
+          <select id="c_term" name="c_term" aria-label="Select C-Terminus">
+            <option value="OH">-OH (Carboxylic Acid)</option>
+            <option value="NH2">-NH<sub>2</sub> (Amide)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- pH slider and Calculate button -->
+      <div class="form-action-row">
+        <div class="ph-slider">
+          <label for="phInput">Select pH:</label>
+          <!-- pH slider with ARIA labels for accessibility -->
+          <input type="range" id="phInput" name="phInput" min="0" max="14" step="0.1" value="7" aria-valuemin="0" aria-valuemax="14" aria-valuenow="7" aria-valuetext="7.0">
+          <span id="phValue">7.0</span>
+        </div>
+      
+        <!-- Disulfide Bond Inputs -->
+        <div class="disulfide-input">
+          <label for="intra_disulfide_bonds">Intramolecular SS Bonds:</label>
+          <input type="number" id="intra_disulfide_bonds" name="intra_disulfide_bonds" min="0" value="0" step="1">
+        </div>
+
+        <div class="disulfide-input">
+          <label for="inter_disulfide_bonds">Intermolecular SS Bonds:</label>
+          <input type="number" id="inter_disulfide_bonds" name="inter_disulfide_bonds" min="0" value="0" step="1">
+        </div>
+
+        <!-- Calculate Button -->
+        <button type="submit" id="calcButton">Calculate</button>
+
+        <!-- Export Buttons Container -->
+        <div class="export-buttons">
+            <!-- CSV Export Button with Icon -->
+            <button id="exportCsvBtn" disabled data-tooltip="Export CSV">
+                <img src="{{ url_for('static', filename='icons/csv-icon.svg') }}" alt="CSV Export">
+            </button>
+
+            <!-- PDF Export Button with Icon -->
+            <button id="exportPdfBtn" disabled data-tooltip="Export PDF">
+                <img src="{{ url_for('static', filename='icons/pdf-icon.svg') }}" alt="PDF Export">
+            </button>
+        </div>
+
+      </div>
+    </form>
+
+    <!-- ===== Chart and Table Section ===== -->
+    <section class="chart-table-container">
+
+      <div class="top-row">
+
+        <!-- Charts Column -->
+        <div class="ph-chart-column">
+
+          <!-- pH Chart -->
+          <!-- Displays net charge of the peptide across pH range after calculation. Placeholder shown initially. -->
+          <div class="ph-chart card">
+            <h3>Net Charge vs pH</h3>
+            <img alt="Graph showing net charge of the peptide as a function of pH" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display: none;">
+            <div class="no-data-box graph-placeholder" style="display: flex;">Graph will appear here</div>
+          </div>
+
+          <!-- Pie Chart -->
+          <!-- Displays charge distribution (acidic/basic residues) after calculation. -->
+          <div class="charge-pie-chart card">
+            <h3>Charge Distribution</h3>
+            <img alt="Pie chart showing distribution of acidic and basic residues in the peptide" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display: none;">
+            <div class="no-data-box graph-placeholder" style="display: flex;">Graph will appear here</div>
+          </div>
+
+        </div>
+
+        <!-- Results Table -->
+        <!-- Displays all calculated peptide properties -->
+        <div class="results-table">
+          <div class="table-container">
+            <table id="resultsTable" role="table">
+              <thead>
+                <tr>
+                  <th scope="col">Property</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <!-- Basic Properties -->
+                <tr><th colspan="2">Basic Properties</th></tr>
+                <tr><td>Terminus</td><td id="result-termini">-</td></tr>
+                <tr><td>Peptide Length</td><td id="result-length">-</td></tr>
+                <tr><td>Isoelectric Point (pI)</td><td id="result-pi">-</td></tr>
+                <tr><td>Net Charge at Selected pH (<span id="displayed-pH">7.0</span>)</td><td id="result-charge">-</td></tr>
+                <tr><td>GRAVY Score</td><td><span id="result-gravy">-</span> (<span id="result-gravy-classification">-</span>)</td></tr>
+                <tr><td>Peptide Polarity</td><td id="result-polarity">-</td></tr>
+
+                <!-- Molecular Characteristics -->
+                <tr><th colspan="2">Molecular Characteristics</th></tr>
+                <tr><td>Monoisotopic M<sub>w</sub></td><td id="result-mono-mw">-</td></tr>
+                <tr><td>Average M<sub>w</sub></td><td id="result-avg-mw">-</td></tr>
+                <tr><td>Intramolecular SS Bonds</td><td id="result-intra-disulfide-bonds">-</td></tr>
+                <tr><td>Intermolecular SS Bonds</td><td id="result-inter-disulfide-bonds">-</td></tr>
+                <tr><td>Peptide State</td><td id="result-peptide-state">-</td></tr>
+                <tr><td>Extinction Coefficient</td><td id="result-extinction">-</td></tr>
+                <tr><td>Molecular Formula</td><td id="result-formula">-</td></tr>
+
+                <!-- Charge Distribution -->
+                <tr><th colspan="2">Charge Distribution</th></tr>
+                <tr><td>Acidic Residues (D, E)</td><td id="result-acidic-count">-</td></tr>
+                <tr><td>Basic Residues (R, K, H)</td><td id="result-basic-count">-</td></tr>
+                <tr><td>Total Charged Residues</td><td id="result-total-charged">-</td></tr>
+
+                <!-- Indices -->
+                <tr><th colspan="2">Indices</th></tr>
+                <tr><td>Boman Index</td><td id="result-boman">-</td></tr>
+                <tr><td>Aliphatic Index</td><td id="result-aliphatic">-</td></tr>
+                <tr><td>Aromaticity</td><td id="result-aromaticity">-</td></tr>
+                <tr><td>Instability Index</td><td id="result-instability">-</td></tr>
+
+                <!-- Secondary Structure -->
+                <tr><th colspan="2">Secondary Structure</th></tr>
+                <tr><td>Helix (%)</td><td id="result-helix">-</td></tr>
+                <tr><td>Sheet (%)</td><td id="result-sheet">-</td></tr>
+                <tr><td>Coil (%)</td><td id="result-coil">-</td></tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== Hydropathy and Amino Acid Counts Section ===== -->
+      <div class="bottom-row">
+
+        <!-- Legend -->
+        <!-- Displays color legend for residue classification -->
+        <div class="legend-container">
+          <h3>Color Legend</h3>
+          <ul class="legend-list">
+            <li><span class="legend-box" style="background-color: #ffb6c1;"></span> Acidic (D, E)</li>
+            <li><span class="legend-box" style="background-color: #1e90ff;"></span> Basic (R, K, H)</li>
+            <li><span class="legend-box" style="background-color: #90ee90;"></span> Aromatic (F, W, Y)</li>
+            <li><span class="legend-box" style="background-color: #d3d3d3;"></span> Aliphatic (A, I, L, V, M)</li>
+            <li><span class="legend-box" style="background-color: #228B22;"></span> Polar (S, T, N, Q)</li>
+            <li><span class="legend-box" style="background-color: #ffd700;"></span> Cysteine (C)</li>
+            <li><span class="legend-box" style="background-color: #333333;"></span> Others (G, P)</li>
+          </ul>
+        </div>
+
+        <div class="hydropathy-and-counts">
+
+          <!-- Hydropathy Plot - Kyte-Doolittle -->
+          <!-- Displays hydropathy profile based on Kyte-Doolittle scale -->
+          <div class="hydropathy-chart card">
+            <h3>Hydropathy Profile - Kyte-Doolittle</h3>
+            <img alt="Bar graph showing Kyte-Doolittle hydropathy profile of the peptide" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display: none;">
+            <div class="no-data-box graph-placeholder" style="display: flex;">Graph will appear here</div>
+          </div>
+
+          <!-- Hydropathy Plot - Hopp-Woods -->
+          <!-- Displays hydrophilicity profile based on Hopp-Woods scale -->
+          <div class="hydropathy-chart card">
+            <h3>Hydrophilicity Profile - Hopp-Woods</h3>
+            <img alt="Bar graph showing Hopp-Woods hydrophilicity profile of the peptide" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display: none;">
+            <div class="no-data-box graph-placeholder" style="display: flex;">Graph will appear here</div>
+          </div>
+
+          <!-- Amino Acid Counts Table -->
+          <!-- Displays amino acid counts in the peptide -->
+          <div class="aa-counts-table card">
+            <h3>Amino Acid Counts</h3>
+            <div class="table-container">
+              <table id="aaCountsTable" role="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Amino Acid</th>
+                    <th scope="col">Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Rows will be dynamically inserted here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Timestamp of last calculation -->
+    <div class="timestamp">
+      <p>Last calculation: <span id="timestamp">-</span></p>
+    </div>
+  </div> <!-- Close the PDF export container -->
+
+    <!-- Optional Loading Spinner -->
+    <!-- Displays while the backend is processing the calculation -->
+    <div id="loadingSpinner" class="loading-spinner" style="display: none;">Calculating...</div>
+
+  </main>
+
+  <!-- Link to JavaScript file controlling form submission and dynamic updates -->
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+  <!-- ===== Footer Section ===== -->
+  <footer style="margin-top: 50px; text-align: center; padding: 20px; font-family: 'Roboto', sans-serif; color: #333;">
+      <p>
+          If you encountered an issue, please 
+          <a href="https://peptidechemistry.org/contact/" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
+              report a problem
+          </a>.
+      </p>
+      <p>
+          For detailed explanations of all calculations, visit our 
+          <a href="https://peptidechemistry.org/peptideiq/resources" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
+              resources page
+          </a>.
+      </p>
+      <p style="font-size: 14px; color: #777;">PeptideIQ Version: <span id="appVersion">1.0.0</span></p>
+  </footer>
+
+</body>
+</html>

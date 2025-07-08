@@ -1,0 +1,459 @@
+/* ====== Base Styles ====== */
+:root {
+  --primary-blue: #1e90ff; /* Primary theme color */
+  --hover-blue: #0077cc; /* Hover state color */
+  --disabled-gray: #999; /* Disabled button color */
+  --dark-gray: #333333; /* Primary text color */
+  --light-gray: #f9f9f9; /* Background color */
+  --section-header-gray: #e0e0e0; /* Table section header color */
+}
+
+body {
+  margin: 0; /* Remove large default margin */
+  padding: 0; /* Remove default padding */
+  font-family: 'Roboto', sans-serif; /* Clean, modern font */
+  font-size: 15px; /* Base text size */
+  font-weight: 400; /* Normal font weight */
+  color: var(--dark-gray); /* Dark gray text color for readability */
+  background: var(--light-gray); /* Light gray background for a clean look */
+  line-height: 1.5; /* Comfortable line spacing */
+}
+
+.main-content {
+  padding: 10px; /* Reduced internal spacing */
+  flex-grow: 1; /* Allows the content to grow in a flex container */
+  min-width: 0; /* Ensures content can shrink if necessary */
+  max-width: 100%; /* Allow content to use full screen width */
+  margin: 0 auto; /* Centers the content horizontally */
+}
+
+/* ====== Input, Select, Button Styles ====== */
+input,
+select,
+button {
+  margin: 10px 0; /* Adds vertical spacing */
+  padding: 0.5rem; /* Adds internal padding for click/tap targets */
+  font-size: 1rem; /* Ensures consistent font sizing */
+  box-sizing: border-box; /* Includes padding and border in width calculations */
+}
+
+/* Highlight elements on focus for accessibility */
+input:focus,
+select:focus,
+button:focus {
+  outline: 2px solid var(--primary-blue); /* Blue outline for focus */
+  outline-offset: 2px; /* Adds space between the element and the outline */
+}
+
+.sequence-row input,
+.sequence-row select {
+  width: 100%; /* Makes inputs and selects full width in their container */
+}
+
+/* Primary Button Styles */
+button {
+  background-color: var(--primary-blue); /* Primary blue color */
+  color: white; /* White text */
+  border: none; /* Removes default button border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+/* Button hover effect */
+button:hover {
+  background-color: var(--hover-blue); /* Darker blue on hover */
+}
+
+/* Disabled/Loading Button Styles */
+button:disabled,
+button.loading {
+  background-color: var(--disabled-gray); /* Greyed out appearance */
+  cursor: not-allowed; /* Visual indication of non-interactivity */
+}
+
+/* ====== Form Layout ====== */
+.sequence-form {
+  margin-bottom: 2rem; /* Space below the form */
+}
+
+.sequence-row {
+  display: flex; /* Flexbox layout */
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  gap: 10px; /* Space between form elements */
+  align-items: flex-end; /* Aligns inputs to the bottom */
+  margin-bottom: 1rem; /* Space below the row */
+}
+
+.termini-select {
+  flex: 0 0 150px; /* Fixed width for termini selects */
+  min-width: 100px; /* Ensures minimum width */
+}
+
+.sequence-input {
+  flex: 1 1 auto; /* Flexible width input */
+  min-width: 150px; /* Minimum width for input */
+}
+
+.sequence-row label {
+  font-weight: bold; /* Makes labels bold */
+  margin-bottom: 4px; /* Space below labels */
+}
+
+/* ====== Slider and Button Row ====== */
+.form-action-row {
+  display: flex; /* Flexbox layout */
+  align-items: center; /* Vertically centers elements */
+  gap: 1rem; /* Space between slider and button */
+  margin-top: 1rem; /* Space above the row */
+}
+
+.ph-slider {
+  display: flex; /* Flexbox layout */
+  align-items: center; /* Vertically centers slider and label */
+}
+
+/* ====== Disulfide Bond Input ====== */
+/* Container for disulfide bond label and input */
+.disulfide-input {
+  display: flex;            /* Use flexbox for horizontal layout */
+  align-items: center;      /* Vertically center the label and input field */
+  gap: 5px;                 /* Add small spacing between the label and the input box */
+}
+
+/* Label styling for disulfide bond input */
+.disulfide-input label {
+  font-weight: bold;        /* Match the style of other form labels */
+}
+
+.ph-slider label {
+  font-weight: bold; /* Bold label */
+  margin-right: 10px; /* Space between label and slider */
+}
+
+.ph-slider input[type="range"] {
+  width: 200px; /* Fixed slider width */
+  vertical-align: middle; /* Aligns slider vertically */
+}
+
+/* ====== Disulfide Bond Input Box Sizing ====== */
+/* This will make the SS bond input boxes smaller */
+.disulfide-input input {
+  width: 60px; /* Controls the width of the SS bond input boxes */
+}
+
+/* Adds small spacing between label and input */
+.disulfide-input label {
+  margin-right: 5px; /* Space between label and input box */
+}
+
+.ph-slider #phValue {
+  display: inline-block; /* Inline block for layout control */
+  width: 40px; /* Fixed width display box */
+  text-align: center; /* Centers the text */
+  font-weight: bold; /* Bold value text */
+}
+
+/* ====== Chart + Table Container ====== */
+.chart-table-container {
+  display: flex; /* Flexbox container */
+  flex-direction: column; /* Stack charts and tables vertically */
+  gap: 2rem; /* Space between sections */
+}
+
+/* ====== Top Row: Charts + Table ====== */
+.top-row {
+  display: flex; /* Flexbox layout */
+  gap: 2rem; /* Space between chart and table */
+  margin-bottom: 2rem; /* Space below top row */
+}
+
+.ph-chart-column {
+  flex: 0 0 25%; /* Fixed width column */
+  display: flex; /* Flexbox layout */
+  flex-direction: column; /* Stack charts vertically */
+  gap: 2rem; /* Space between charts */
+}
+
+.ph-chart,
+.charge-pie-chart {
+  width: 100%; /* Full width in container */
+}
+
+.results-table {
+  flex: 1 1 75%; /* Flexible table width */
+  width: 100%; /* Full width */
+}
+
+.table-container {
+  overflow-x: auto; /* Enables horizontal scrolling if needed */
+  width: 100%; /* Full width */
+}
+
+/* ====== Results Table ====== */
+#resultsTable,
+#aaCountsTable {
+  width: 100%; /* Full width */
+  min-width: 400px; /* Minimum width for ultra-minimalist style */
+  table-layout: fixed; /* Equal column widths */
+  border-collapse: collapse; /* Clean table borders */
+  font-family: 'Roboto', sans-serif; /* Consistent font */
+  color: var(--dark-gray); /* Table text color */
+  font-size: 14px; /* Base table font size */
+}
+
+#resultsTable th,
+#aaCountsTable th {
+  background-color: var(--primary-blue); /* Blue table headers */
+  color: white; /* White header text */
+  text-align: center; /* Center header text */
+  padding: 2px 3px; /* Correct minimalist padding */
+  border: 1px solid #ddd; /* Light gray table borders */
+}
+
+#resultsTable td,
+#aaCountsTable td {
+  text-align: left; /* Left-align table content */
+  padding: 2px 3px; /* Correct minimalist padding */
+  border: 1px solid #ddd; /* Light gray table borders */
+  word-wrap: break-word; /* Wrap long content */
+}
+
+#resultsTable th[colspan="2"] {
+  background-color: var(--section-header-gray); /* Gray section headers */
+  color: var(--dark-gray); /* Dark text */
+  text-align: left; /* Left-align section headers */
+  padding: 5px 3px; /* Extra padding */
+  font-weight: bold; /* Bold section headers */
+}
+
+/* ====== Table Row Hover Effect ====== */
+#resultsTable tbody tr:hover,
+#aaCountsTable tbody tr:hover {
+  background-color: #f0f8ff; /* Light blue highlight on hover */
+}
+
+/* ====== Bottom Row: Hydropathy and Amino Acid Counts ====== */
+.bottom-row {
+  display: flex; /* Flexbox layout */
+  gap: 2rem; /* Space between elements */
+}
+
+.legend-container {
+  flex: 0 0 25%; /* Fixed width for legend */
+  padding: 0; /* No padding */
+  background-color: transparent; /* Transparent background */
+  border: none; /* No border */
+  border-radius: 0; /* No border radius */
+}
+
+.legend-list {
+  list-style: none; /* Removes list bullets */
+  padding: 0; /* Removes list padding */
+}
+
+.legend-list li {
+  display: flex; /* Flexbox layout */
+  align-items: center; /* Vertically centers items */
+  margin-bottom: 0.5rem; /* Space between legend items */
+}
+
+.legend-box {
+  display: inline-block; /* Box layout */
+  width: 20px; /* Fixed box size */
+  height: 20px; /* Fixed box size */
+  margin-right: 10px; /* Space between box and label */
+  border: 1px solid var(--dark-gray); /* Dark gray border */
+}
+
+.hydropathy-and-counts {
+  flex: 1 1 75%; /* Flexible width */
+  display: flex; /* Flexbox layout */
+  flex-direction: column; /* Stack content vertically */
+  gap: 2rem; /* Space between elements */
+}
+
+.hydropathy-chart img,
+.ph-chart img,
+.charge-pie-chart img {
+  width: 100%; /* Full width in container */
+  max-height: 300px; /* Max graph height */
+  height: auto; /* Maintain aspect ratio */
+  display: block; /* Block layout */
+  object-fit: contain; /* Contain image within the box */
+}
+
+/* ====== Graph Placeholders with Animation ====== */
+.no-data-box {
+  width: 100%; /* Full width */
+  height: 200px; /* Fixed height */
+  display: flex; /* Flexbox layout */
+  align-items: center; /* Center text vertically */
+  justify-content: center; /* Center text horizontally */
+  border: 2px dashed #999; /* Dashed gray border */
+  color: #999; /* Light gray text */
+  font-weight: bold; /* Bold placeholder text */
+  background-color: var(--light-gray); /* Matches page background */
+  text-align: center; /* Center text alignment */
+  animation: pulse 2s infinite; /* Pulsing animation */
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.graph-placeholder {
+  max-height: 300px; /* Consistent max height with graphs */
+}
+
+/* ====== Responsive Adjustments ====== */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 5px; /* Nearly edge-to-edge on mobile */
+  }
+  .hydropathy-chart img,
+  .ph-chart img,
+  .charge-pie-chart img {
+    max-height: 200px; /* Smaller graphs on small screens */
+  }
+
+  .graph-placeholder {
+    max-height: 200px; /* Match graph height */
+  }
+
+  .top-row,
+  .bottom-row {
+    flex-direction: column; /* Stack layout on small screens */
+  }
+
+  .ph-chart-column,
+  .ph-chart,
+  .charge-pie-chart,
+  .results-table,
+  .legend-container,
+  .hydropathy-and-counts,
+  .hydropathy-chart,
+  .aa-counts-table {
+    width: 100%; /* Full width on small screens */
+  }
+
+  .form-action-row {
+    flex-direction: column; /* Stack slider and button */
+    align-items: flex-start; /* Left-align on small screens */
+  }
+
+  .ph-slider input[type="range"] {
+    width: 100%; /* Full width slider */
+  }
+
+  #resultsTable td,
+  #resultsTable th,
+  #aaCountsTable td,
+  #aaCountsTable th {
+    padding: 5px 4px; /* Slightly larger padding for touch targets */
+  }
+
+  #resultsTable,
+  #aaCountsTable {
+    font-size: 12px; /* Smaller font size on mobile */
+  }
+}
+
+/* ====== Timestamp ====== */
+.timestamp {
+  margin-top: 2rem; /* Space above timestamp */
+  font-size: 0.9rem; /* Smaller text */
+  color: #555; /* Muted gray color */
+  text-align: right; /* Align to the right */
+}
+
+/* ====== Export Button Icons (CSV/PDF) ====== */
+/* Container for the export buttons placed next to Calculate button */
+.export-buttons {
+  display: flex;                /* Arrange buttons in a row */
+  align-items: center;          /* Vertically center the buttons */
+  gap: 0.5rem;                  /* Space between the two buttons */
+}
+
+/* Each export button styling */
+.export-buttons button {
+  width: 40px;                  /* Square button size */
+  height: 40px;
+  padding: 0;                   /* Remove default padding */
+  display: flex;                /* Center icon inside the button */
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;           /* Make buttons perfectly circular */
+  background-color: var(--primary-blue); /* Use primary blue color */
+  border: none;                 /* Remove default button border */
+  cursor: pointer;              /* Pointer cursor on hover */
+  position: relative;           /* Needed for tooltip positioning */
+}
+
+/* Icon inside the button */
+.export-buttons button img {
+  width: 20px;                  /* Icon size */
+  height: 20px;
+}
+
+/* Hover effect for export buttons */
+.export-buttons button:hover {
+  background-color: var(--hover-blue); /* Darker blue on hover */
+}
+
+/* Disabled export button style (inherits existing style) */
+.export-buttons button:disabled {
+  background-color: var(--disabled-gray) !important; /* Gray background */
+  cursor: not-allowed;                               /* Show not-allowed cursor */
+}
+
+/* Tooltip styling (hidden by default) */
+.export-buttons button::after {
+  content: attr(data-tooltip);  /* Display text from data-tooltip attribute */
+  position: absolute;           /* Position relative to button */
+  bottom: -30px;                /* Position below the button */
+  left: 50%;                    /* Center horizontally */
+  transform: translateX(-50%);  /* Fine-tune centering */
+  background-color: #333;       /* Dark tooltip background */
+  color: white;                 /* White tooltip text */
+  padding: 4px 8px;             /* Tooltip padding */
+  border-radius: 4px;           /* Rounded tooltip corners */
+  font-size: 12px;              /* Small tooltip text */
+  white-space: nowrap;          /* Prevent tooltip wrapping */
+  opacity: 0;                   /* Start fully transparent */
+  pointer-events: none;         /* Prevent accidental clicks */
+  transition: opacity 0.3s ease;/* Smooth fade-in transition */
+  z-index: 100;                 /* Make sure tooltip appears above other elements */
+}
+
+/* Show tooltip when button is hovered */
+.export-buttons button:hover::after {
+  opacity: 1;                   /* Tooltip becomes visible on hover */
+}
+
+@media print {
+  form, .export-buttons, .loading-spinner, footer {
+    display: none !important; /* Hide input sections, buttons, and footer */
+  }
+
+  table, img {
+    page-break-inside: avoid; /* Keep tables and images intact across pages */
+  }
+
+  .bottom-row {
+    page-break-before: always; /* Force the bottom row to a new page */
+  }
+
+  body {
+    background: white !important; /* White background for PDF */
+    color: black !important; /* Black text for readability */
+  }
+}
