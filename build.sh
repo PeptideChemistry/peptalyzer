@@ -20,4 +20,11 @@ fi
 rpm2cpio wkhtmltox-0.12.6-1.centos7.x86_64.rpm | cpio -idmv
 
 # Copy binary to final bin dir
-cp usr/local/bin/wkhtmltopdf ../b
+cp usr/local/bin/wkhtmltopdf ../bin/wkhtmltopdf
+chmod +x ../bin/wkhtmltopdf
+
+# Cleanup
+cd ..
+rm -rf tmp
+
+echo "✅ wkhtmltopdf installed at /app/bin/wkhtmltopdf"
