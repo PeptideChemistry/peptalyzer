@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: peptideiq  # must match your Render service name exactly
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "./build.sh && pip install -r requirements.txt"
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
