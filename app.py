@@ -284,5 +284,14 @@ def export_pdf():
     except Exception as e:
         return f"Error generating PDF: {e}", 500
 
+@app.route("/test_pdf")
+def test_pdf():
+    import subprocess
+    try:
+        result = subprocess.run(["/app/bin/wkhtmltopdf", "--version"], capture_output=True, text=True)
+        return f"<pre>{result.stdout or result.stderr}</pre>"
+    except Exception as e:
+        return f"<pre>Error: {e}</pre>"
+
 if __name__ == "__main__":
     app.run(debug=True)
