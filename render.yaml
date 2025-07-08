@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: peptide-calculator
+    name: peptideiq  # must match your Render service name exactly
     env: python
     region: oregon
     plan: free
