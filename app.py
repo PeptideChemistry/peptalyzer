@@ -2,9 +2,7 @@ from flask import Flask, request, jsonify, render_template, send_file
 from flask_cors import CORS
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 from datetime import datetime, timezone
-import tempfile
-import pdfkit
-from flask import request
+from weasyprint import HTML
 from peptide_helpers import (
     validate_sequence,
     calculate_net_charge,
@@ -261,21 +259,13 @@ def export_pdf():
     rendered_html = render_template("report_template.html", data=latest_results)
 
     try:
-        config = pdfkit.configuration(wkhtmltopdf='/app/bin/wkhtmltopdf')
-        pdf = pdfkit.from_string(
-            rendered_html,
-            False,
-            options={
-                "enable-local-file-access": "",
-                "quiet": "",
-                "no-stop-slow-scripts": "",
-                "load-error-handling": "ignore"
-            },
-            configuration=config
-        )
+        # Generate PDF using WeasyPrint
+        pdf_io = io.BytesIO()
+        HTML(string=rendered_html, base_url=request.host_url).write_pdf(pdf_io)
+        pdf_io.seek(0)
 
         return send_file(
-            io.BytesIO(pdf),
+            pdf_io,
             as_attachment=True,
             download_name="peptide_report.pdf",
             mimetype='application/pdf'
@@ -283,15 +273,6 @@ def export_pdf():
 
     except Exception as e:
         return f"Error generating PDF: {e}", 500
-
-@app.route("/test_pdf")
-def test_pdf():
-    import subprocess
-    try:
-        result = subprocess.run(["/app/bin/wkhtmltopdf", "--version"], capture_output=True, text=True)
-        return f"<pre>{result.stdout or result.stderr}</pre>"
-    except Exception as e:
-        return f"<pre>Error: {e}</pre>"
 
 if __name__ == "__main__":
     app.run(debug=True)
