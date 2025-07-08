@@ -261,7 +261,7 @@ def export_pdf():
     rendered_html = render_template("report_template.html", data=latest_results)
 
     try:
-        config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
+        config = pdfkit.configuration(wkhtmltopdf='/app/bin/wkhtmltopdf')
         pdf = pdfkit.from_string(
             rendered_html,
             False,
