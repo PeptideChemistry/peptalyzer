@@ -9,13 +9,13 @@ cd tmp
 # Download CentOS-compatible RPM
 curl -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox-0.12.6-1.centos7.x86_64.rpm
 
-# Use local Python rpm2cpio
-python3 ../rpm2cpio.py wkhtmltox-0.12.6-1.centos7.x86_64.rpm | cpio -idmv
+# Extract RPM using Python script
+python3 ../rpm2cpio.py wkhtmltox-0.12.6-1.centos7.x86_64.rpm
 
 # Copy the binary
-cp usr/local/bin/wkhtmltopdf ../bin/wkhtmltopdf
+cp extracted/usr/local/bin/wkhtmltopdf ../bin/wkhtmltopdf
 chmod +x ../bin/wkhtmltopdf
 
-# Clean up
+# Cleanup
 cd ..
-rm -rf tmp
+rm -rf tmp extracted

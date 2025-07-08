@@ -20,3 +20,4 @@ six==1.17.0
 Werkzeug==3.1.3
 gunicorn==21.2.0
 pdfkit==1.0.0
+cpioextract==1.2.0cpioextract==1.2.0
