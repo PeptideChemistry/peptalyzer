@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Peptide Calculator - Results</title>
+  <title>PeptideIQ – Free Online Peptide Calculator for Mass, pI, Charge, Hydropathy</title>
 
   <!-- Meta description for search engines -->
-  <meta name="description" content="Peptide Calculator for quick peptide property predictions and visualizations.">
+  <meta name="description" content="Use PeptideIQ to calculate peptide molecular weight, isoelectric point (pI), charge, hydropathy, extinction coefficient, and more. Free scientific peptide analysis tool.">
   <!-- SEO keywords -->
   <meta name="keywords" content="peptide calculator, peptide properties, peptide visualization, peptide synthesis, peptide sequence analysis, peptide tools">
 
@@ -23,12 +23,11 @@
 
 <body>
   <!-- ===== PeptideIQ Header ===== -->
-  <div style="display: flex; justify-content: center; align-items: center; margin-top: 40px; margin-bottom: 20px; flex-direction: column;">
-      <a href="https://peptidechemistry.org/" style="display: flex; align-items: center; text-decoration: none;">
-          <img class="peptide-logo" src="{{ url_for('peptideiq.static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="PeptideChemistry Logo">
-          <h1 style="font-size: 32px; color: #1e90ff; font-family: 'Roboto', sans-serif; margin: 0;">Peptide<span style="color: #333; font-weight: bold;">IQ</span></h1>
-      </a>
-      <!-- Sequence is now outside the link -->
+  <div style="display: flex; align-items: center;">
+    <img class="peptide-logo" src="{{ url_for('peptideiq.static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="PeptideChemistry Logo">
+    <h1 style="font-size: 32px; color: #1e90ff; font-family: 'Roboto', sans-serif; margin: 0;">
+      Peptide<span style="color: #333; font-weight: bold;">IQ</span>
+    </h1>
   </div>
 
   <main class="main-content">
