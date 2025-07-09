@@ -3,6 +3,7 @@ from flask_cors import CORS
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 from datetime import datetime, timezone
 from weasyprint import HTML
+from flask import redirect
 from peptide_helpers import (
     validate_sequence,
     calculate_net_charge,
@@ -276,6 +277,12 @@ def export_pdf():
         return f"Error generating PDF: {e}", 500
 
 app.register_blueprint(peptideiq)
+
+from flask import redirect
+
+@app.route("/")
+def redirect_root():
+    return redirect("/peptideiq/")
 
 if __name__ == "__main__":
     app.run(debug=True)
