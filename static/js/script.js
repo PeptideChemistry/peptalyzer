@@ -190,7 +190,10 @@ interInput.addEventListener("input", disableExportButtons);
   });
 
   exportPdfBtn.addEventListener("click", () => {
-    window.location.href = "/peptideiq/export_pdf";
+    const pathPrefix = window.location.pathname.endsWith('/')
+      ? window.location.pathname
+      : window.location.pathname + '/';
+    window.location.href = `${pathPrefix}export_pdf`;
   });
 
   form.addEventListener("submit", async (e) => {
@@ -209,8 +212,13 @@ interInput.addEventListener("input", disableExportButtons);
     const intra_disulfide_bonds = parseInt(document.getElementById("intra_disulfide_bonds").value, 10);
     const inter_disulfide_bonds = parseInt(document.getElementById("inter_disulfide_bonds").value, 10);
 
+    // ✅ Add this:
+    const pathPrefix = window.location.pathname.endsWith('/')
+      ? window.location.pathname
+      : window.location.pathname + '/';
+
     try {
-      const response = await fetch("/peptideiq/calculate", {
+      const response = await fetch(`${pathPrefix}calculate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -12,20 +12,20 @@
   <meta name="keywords" content="peptide calculator, peptide properties, peptide visualization, peptide synthesis, peptide sequence analysis, peptide tools">
 
   <!-- Favicon -->
-  <link rel="icon" href="{{ url_for('static', filename='favicon.ico', blueprint='peptideiq') }}">
+  <link rel="icon" href="{{ url_for('peptideiq.static', filename='favicon.ico') }}">
 
   <!-- Roboto font -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Custom stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', blueprint='peptideiq') }}">
+  <link rel="stylesheet" href="{{ url_for('peptideiq.static', filename='css/style.css') }}">
 </head>
 
 <body>
   <!-- ===== PeptideIQ Header ===== -->
   <div style="display: flex; justify-content: center; align-items: center; margin-top: 40px; margin-bottom: 20px; flex-direction: column;">
       <a href="https://peptidechemistry.org/" style="display: flex; align-items: center; text-decoration: none;">
-          <img src="{{ url_for('static', filename='icons/PeptideChemistry_Logo.svg', blueprint='peptideiq') }}">
+          <img src="{{ url_for('peptideiq.static', filename='icons/PeptideChemistry_Logo.svg') }}">
           <h1 style="font-size: 32px; color: #1e90ff; font-family: 'Roboto', sans-serif; margin: 0;">Peptide<span style="color: #333; font-weight: bold;">IQ</span></h1>
       </a>
       <!-- Sequence is now outside the link -->
@@ -91,12 +91,12 @@
         <div class="export-buttons">
             <!-- CSV Export Button with Icon -->
             <button id="exportCsvBtn" disabled data-tooltip="Export CSV">
-                <img src="{{ url_for('static', filename='icons/csv-icon.svg', blueprint='peptideiq') }}">
+                <img src="{{ url_for('peptideiq.static', filename='icons/csv-icon.svg') }}">
             </button>
 
             <!-- PDF Export Button with Icon -->
             <button id="exportPdfBtn" disabled data-tooltip="Export PDF">
-                <img src="{{ url_for('static', filename='icons/pdf-icon.svg', blueprint='peptideiq') }}">
+                <img src="{{ url_for('peptideiq.static', filename='icons/pdf-icon.svg') }}">
             </button>
         </div>
 
@@ -261,7 +261,7 @@
   </main>
 
   <!-- Link to JavaScript file controlling form submission and dynamic updates -->
-  <script src="{{ url_for('static', filename='js/script.js', blueprint='peptideiq') }}"></script>
+  <script src="{{ url_for('peptideiq.static', filename='js/script.js') }}"></script>
 
   <!-- ===== Footer Section ===== -->
   <footer style="margin-top: 50px; text-align: center; padding: 20px; font-family: 'Roboto', sans-serif; color: #333;">
