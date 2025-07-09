@@ -460,10 +460,11 @@ button.loading {
 
 /* ====== Logo Sizing ====== */
 .peptide-logo {
-  max-width: 120px;
-  height: auto;
-  display: block;
-  margin-bottom: 10px;
+  max-height: 40px;         /* constrain height */
+  width: auto;              /* auto scale width */
+  display: inline-block;    /* inline alignment */
+  margin-right: 10px;       /* space between image and text */
+  vertical-align: middle;   /* aligns with text */
 }
 
 @media (max-width: 768px) {
