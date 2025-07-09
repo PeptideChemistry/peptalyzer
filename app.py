@@ -47,7 +47,7 @@ app = Flask(__name__)
 peptideiq = Blueprint(
     'peptideiq',
     __name__,
-    url_prefix='/peptideiq',
+    url_prefix='/peptideiq/app',
     static_folder='static',
     template_folder='templates'
 )

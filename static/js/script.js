@@ -190,9 +190,7 @@ interInput.addEventListener("input", disableExportButtons);
   });
 
   exportPdfBtn.addEventListener("click", () => {
-    const pathPrefix = window.location.pathname.endsWith('/')
-      ? window.location.pathname
-      : window.location.pathname + '/';
+    const pathPrefix = "/peptideiq/app/";
     window.location.href = `${pathPrefix}export_pdf`;
   });
 
