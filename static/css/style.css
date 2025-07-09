@@ -457,3 +457,23 @@ button.loading {
     color: black !important; /* Black text for readability */
   }
 }
+
+/* ====== Logo Sizing ====== */
+.peptide-logo {
+  max-width: 120px;
+  height: auto;
+  display: block;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .peptide-logo {
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .peptide-logo {
+    max-width: 80px;
+  }
+}
