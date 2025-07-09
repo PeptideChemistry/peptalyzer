@@ -44,7 +44,13 @@ import io
 import base64
 
 app = Flask(__name__)
-peptideiq = Blueprint('peptideiq', __name__, url_prefix='/peptideiq')
+peptideiq = Blueprint(
+    'peptideiq',
+    __name__,
+    url_prefix='/peptideiq',
+    static_folder='static',
+    template_folder='templates'
+)
 CORS(app)
 latest_results = {}
 
