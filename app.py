@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, send_file
+from flask import Flask, Blueprint, request, jsonify, render_template, send_file
 from flask_cors import CORS
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 from datetime import datetime, timezone
@@ -44,14 +44,15 @@ import io
 import base64
 
 app = Flask(__name__)
+peptideiq = Blueprint('peptideiq', __name__, url_prefix='/peptideiq')
 CORS(app)
 latest_results = {}
 
-@app.route("/")
+@peptideiq.route("/")
 def index():
     return render_template("index.html")
 
-@app.route("/calculate", methods=["POST"])
+@peptideiq.route("/calculate", methods=["POST"])
 def calculate_properties():
     data = request.get_json()
     debug = bool(data.get("debug", False))
@@ -245,7 +246,7 @@ def calculate_properties():
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "An internal error occurred.", "details": str(e)}), 500
 
-@app.route("/export_pdf")
+@peptideiq.route("/export_pdf")
 def export_pdf():
     global latest_results
 
@@ -273,6 +274,8 @@ def export_pdf():
 
     except Exception as e:
         return f"Error generating PDF: {e}", 500
+
+app.register_blueprint(peptideiq)
 
 if __name__ == "__main__":
     app.run(debug=True)
