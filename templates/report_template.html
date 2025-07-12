@@ -1,64 +1,23 @@
 <!-- templates/report_template.html -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <title>Peptalyzer™ Report</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/report_style.css') }}">
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      margin: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-
-    table, th, td {
-      border: 1px solid #ddd;
-    }
-
-    th, td {
-      padding: 8px;
-      text-align: left;
-    }
-
-    h1 {
-      color: #1e90ff;
-    }
-
-    .section-title {
-      margin-top: 30px;
-      font-size: 22px;
-    }
-
-    img {
-      display: block;
-      margin: 20px auto;
-      max-width: 100%;
-    }
-  </style>
 </head>
-
 <body>
 
-<!-- Appears only once, first page -->
-<div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px; page-break-after: avoid;">
-  <img src="{{ url_for('static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Peptide Chemistry Logo"
-       class="peptide-logo">
-  <h1 style="margin: 0; font-size: 20px; vertical-align: middle;">Peptalyzer™ Report</h1>
+<!-- Visible only on the first page -->
+<div class="first-page-header">
+  <img class="peptide-logo" src="{{ url_for('static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Peptide Chemistry Logo">
+  <h1 class="report-title">Peptalyzer™ Report</h1>
+  <p class="report-subtitle">peptidechemistry.org | Last Calculation: {{ data.timestamp | datetimeformat }}</p>
 </div>
-<p style="text-align: center; font-size: 12px; margin-top: -5px; margin-bottom: 20px;">
-  peptidechemistry.org | Last Calculation: {{ data.timestamp | datetimeformat }}
-</p>
 
 <section>
   <h2 class="section-title">Peptide Sequence</h2>
-  <p style="font-size: 18px;"><strong>Sequence:</strong> {{ data.sequence }}</p>
+  <p><strong>Sequence:</strong> {{ data.sequence }}</p>
   <p><strong>Terminus:</strong> {{ data.terminal_modifications }}</p>
 </section>
 
@@ -112,25 +71,21 @@
   </table>
 </section>
 
-<section>
+<section class="graph-section">
   <h2 class="section-title">Graphs</h2>
-
-  <div style="page-break-inside: avoid;">
+  <div>
     <h3>Net Charge vs pH</h3>
     <img src="data:image/png;base64,{{ data.net_charge_plot }}" alt="Net Charge vs pH">
   </div>
-
-  <div style="page-break-inside: avoid;">
+  <div>
     <h3>Charge Distribution Pie Chart</h3>
     <img src="data:image/png;base64,{{ data.charge_distribution_pie }}" alt="Charge Distribution Pie Chart">
   </div>
-
-  <div style="page-break-inside: avoid;">
+  <div>
     <h3>Hydropathy Profile - Kyte-Doolittle</h3>
     <img src="data:image/png;base64,{{ data.hydropathy_plot }}" alt="Kyte-Doolittle Hydropathy">
   </div>
-
-  <div style="page-break-inside: avoid;">
+  <div>
     <h3>Hydrophilicity Profile - Hopp-Woods</h3>
     <img src="data:image/png;base64,{{ data.hopp_woods_plot }}" alt="Hopp-Woods Hydrophilicity">
   </div>
@@ -138,7 +93,7 @@
 
 <div class="final-footer">
   <hr>
-  <p style="text-align:center; font-size: 11px; color: #555;">
+  <p>
     Peptalyzer™ Version: 1.0.0<br>
     <a href="https://peptidechemistry.org/contact/">Contact Support</a> |
     <a href="https://peptidechemistry.org/peptalyzer/resources">Resources</a><br>
