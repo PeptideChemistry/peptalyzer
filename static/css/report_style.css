@@ -75,15 +75,25 @@ section {
     margin-bottom: 20px;
 }
 
+/* ====== Print-specific overrides ====== */
 @media print {
-    body {
-        background: white;
-        color: black;
-    }
-    img {
-        page-break-inside: avoid;
-    }
-    table {
-        page-break-inside: avoid;
-    }
+  /* Base print adjustments */
+  body {
+    background: white;
+    color: black;
+    font-size: 13px; /* Increased for print legibility */
+  }
+
+  img, table {
+    page-break-inside: avoid;
+  }
+
+  /* Section page breaks */
+  section {
+    page-break-before: always;
+  }
+
+  section:first-of-type {
+    page-break-before: auto;
+  }
 }

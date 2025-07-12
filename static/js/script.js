@@ -190,8 +190,7 @@ interInput.addEventListener("input", disableExportButtons);
   });
 
   exportPdfBtn.addEventListener("click", () => {
-    const pathPrefix = "/peptalyzer/app/";
-    window.location.href = "/peptalyzer/app/export_pdf";
+    window.open("/peptalyzer/app/report/preview", "_blank");
   });
 
   form.addEventListener("submit", async (e) => {

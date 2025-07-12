@@ -1,8 +1,7 @@
-from flask import Flask, Blueprint, request, jsonify, render_template, send_file
+from flask import Flask, Blueprint, request, jsonify, render_template
 from flask_cors import CORS
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 from datetime import datetime, timezone
-from weasyprint import HTML
 from peptide_helpers import (
     validate_sequence,
     calculate_net_charge,
@@ -39,7 +38,6 @@ from input_validator import validate_input
 
 import matplotlib
 matplotlib.use('Agg')  # Use non-GUI backend for macOS compatibility
-import matplotlib.pyplot as plt
 import io
 import base64
 
@@ -52,14 +50,16 @@ peptalyzer = Blueprint(
     template_folder='templates'
 )
 CORS(app)
-latest_results = {}
+latest_calculation = {}
 
 @peptalyzer.route("/")
 def index():
+    """Render the main app interface."""
     return render_template("index.html")
 
 @peptalyzer.route("/calculate", methods=["POST"])
 def calculate_properties():
+    """Receive peptide input via JSON, calculate all relevant properties, and return them."""
     data = request.get_json()
     debug = bool(data.get("debug", False))
     pH_min = float(data.get("pH_min", 0.0))
@@ -175,9 +175,6 @@ def calculate_properties():
         # Step 9: Reformat molecular formula for display
         molecular_formula['formatted'] = format_molecular_formula(molecular_formula['raw'])
 
-        # Reformat the molecular formula for display after adjustments
-        molecular_formula['formatted'] = format_molecular_formula(molecular_formula['raw'])
-
         total_charge_residues = charge_distribution["acidic_count"] + charge_distribution["basic_count"]
 
         debug_info = {}
@@ -241,49 +238,25 @@ def calculate_properties():
             "debug_info": debug_info if debug else None
         }
         
-        global latest_results
-        latest_results = results
+        global latest_calculation
+        latest_calculation = results
         return jsonify(results)
 
     except Exception as e:
         import traceback
         import logging
-        logging.basicConfig(level=logging.ERROR)
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "An internal error occurred.", "details": str(e)}), 500
 
-@peptalyzer.route("/export_pdf")
-def export_pdf():
-    global latest_results
-
-    if not latest_results:
-        return "No calculation data available to export.", 400
-
-    # Get the base URL for static assets
-    base_url = request.host_url  # Example: 'http://127.0.0.1:5000/'
-
-    # Render the HTML with absolute URLs
-    rendered_html = render_template("report_template.html", data=latest_results)
-
-    try:
-        # Generate PDF using WeasyPrint
-        pdf_io = io.BytesIO()
-        HTML(string=rendered_html, base_url=request.host_url).write_pdf(pdf_io)
-        pdf_io.seek(0)
-
-        return send_file(
-            pdf_io,
-            as_attachment=True,
-            download_name="peptide_report.pdf",
-            mimetype='application/pdf'
-        )
-
-    except Exception as e:
-        return f"Error generating PDF: {e}", 500
+@peptalyzer.route("/report/preview")
+def preview_report():
+    """Render the most recent peptide results as a printable report."""
+    global latest_calculation
+    if not latest_calculation:
+        return "No calculation data available to preview.", 400
+    return render_template("report_template.html", data=latest_calculation)
 
 app.register_blueprint(peptalyzer)
-
-from flask import redirect
 
 if __name__ == "__main__":
     app.run(debug=True)
