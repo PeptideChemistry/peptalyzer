@@ -20,11 +20,12 @@
 
 <body>
 
-<header>
-    <img src="{{ url_for('static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Peptalyzer Logo" style="height: 60px;">
-    <h1>Peptalyzer™ Report</h1>
-    <p><a href="https://peptidechemistry.org" style="color: #1e90ff;">peptidechemistry.org</a></p>
-    <p><strong>Last Calculation:</strong> {{ data.timestamp | datetimeformat }}</p>
+<header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+    <img src="{{ url_for('static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Peptide Chemistry Logo" style="height: 40px; margin-right: 12px;">
+    <div style="flex-grow: 1;">
+        <h1 style="margin: 0; font-size: 20px;">Peptalyzer™ Report</h1>
+        <p style="font-size: 12px; margin: 4px 0;">peptidechemistry.org | Last Calculation: {{ data.timestamp | datetimeformat }}</p>
+    </div>
 </header>
 
 <section>
@@ -85,17 +86,25 @@
 
 <section>
     <h2 class="section-title">Graphs</h2>
-    <h3>Net Charge vs pH</h3>
-    <img src="data:image/png;base64,{{ data.net_charge_plot }}" alt="Net Charge vs pH">
+    <div style="page-break-inside: avoid;">
+        <h3>Net Charge vs pH</h3>
+        <img src="data:image/png;base64,{{ data.net_charge_plot }}" alt="Net Charge vs pH">
+    </div>
 
-    <h3>Charge Distribution Pie Chart</h3>
-    <img src="data:image/png;base64,{{ data.charge_distribution_pie }}" alt="Charge Distribution Pie Chart">
+    <div style="page-break-inside: avoid;">
+        <h3>Charge Distribution Pie Chart</h3>
+        <img src="data:image/png;base64,{{ data.charge_distribution_pie }}" alt="Charge Distribution Pie Chart">
+    </div>
 
-    <h3>Hydropathy Profile - Kyte-Doolittle</h3>
-    <img src="data:image/png;base64,{{ data.hydropathy_plot }}" alt="Kyte-Doolittle Hydropathy">
+    <div style="page-break-inside: avoid;">
+        <h3>Hydropathy Profile - Kyte-Doolittle</h3>
+        <img src="data:image/png;base64,{{ data.hydropathy_plot }}" alt="Kyte-Doolittle Hydropathy">
+    </div>
 
-    <h3>Hydrophilicity Profile - Hopp-Woods</h3>
-    <img src="data:image/png;base64,{{ data.hopp_woods_plot }}" alt="Hopp-Woods Hydrophilicity">
+    <div style="page-break-inside: avoid;">
+        <h3>Hydrophilicity Profile - Hopp-Woods</h3>
+        <img src="data:image/png;base64,{{ data.hopp_woods_plot }}" alt="Hopp-Woods Hydrophilicity">
+    </div>
 </section>
 
 <footer>
