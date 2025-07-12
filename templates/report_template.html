@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/report_style.css') }}">
     <style>
         body { font-family: 'Roboto', sans-serif; margin: 20px; }
-        header, footer { text-align: center; margin-bottom: 20px; }
         h1 { color: #1e90ff; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         table, th, td { border: 1px solid #ddd; }
@@ -20,13 +19,14 @@
 
 <body>
 
-<header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+<!-- Main header appears only on first page -->
+<div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px; page-break-after: avoid;">
     <img src="{{ url_for('static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Peptide Chemistry Logo" style="height: 40px; margin-right: 12px;">
-    <div style="flex-grow: 1;">
-        <h1 style="margin: 0; font-size: 20px;">Peptalyzer™ Report</h1>
-        <p style="font-size: 12px; margin: 4px 0;">peptidechemistry.org | Last Calculation: {{ data.timestamp | datetimeformat }}</p>
-    </div>
-</header>
+    <h1 style="margin: 0; font-size: 20px;">Peptalyzer™ Report</h1>
+</div>
+<p style="text-align: center; font-size: 12px; margin-top: -5px; margin-bottom: 20px;">
+    peptidechemistry.org | Last Calculation: {{ data.timestamp | datetimeformat }}
+</p>
 
 <section>
     <h2 class="section-title">Peptide Sequence</h2>
@@ -107,11 +107,16 @@
     </div>
 </section>
 
-<footer>
-    <p>Peptalyzer™ Version: 1.0.0</p>
-    <p><a href="https://peptidechemistry.org/contact/">Contact Support</a> | <a href="https://peptidechemistry.org/peptalyzer/resources">Resources</a></p>
-    <p>© 2025 • Peptide Chemistry</p>
-</footer>
+<!-- FINAL FOOTER (shown once only at the bottom of the document) -->
+<div class="final-footer">
+    <hr>
+    <p style="text-align:center; font-size: 11px; color: #555;">
+        Peptalyzer™ Version: 1.0.0<br>
+        <a href="https://peptidechemistry.org/contact/">Contact Support</a> |
+        <a href="https://peptidechemistry.org/peptalyzer/resources">Resources</a><br>
+        © 2025 • Peptide Chemistry
+    </p>
+</div>
 
 </body>
 </html>
