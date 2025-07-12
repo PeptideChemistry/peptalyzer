@@ -9,7 +9,7 @@ It calculates:
 - Hydropathy plots (Kyte-Doolittle & Hopp-Woods)  
 - Extinction coefficient, secondary structure, and more
 
-🔬 Try it: [https://peptidechemistry.org/peptalyzer](https://peptidechemistry.org/peptalyzer)
+Try it: [https://peptidechemistry.org/peptalyzer](https://peptidechemistry.org/peptalyzer)
 
 ---
 
