@@ -44,21 +44,21 @@ import io
 import base64
 
 app = Flask(__name__)
-peptideiq = Blueprint(
-    'peptideiq',
+peptalyzer = Blueprint(
+    'peptalyzer',
     __name__,
-    url_prefix='/peptideiq/app',
+    url_prefix='/peptalyzer/app',
     static_folder='static',
     template_folder='templates'
 )
 CORS(app)
 latest_results = {}
 
-@peptideiq.route("/")
+@peptalyzer.route("/")
 def index():
     return render_template("index.html")
 
-@peptideiq.route("/calculate", methods=["POST"])
+@peptalyzer.route("/calculate", methods=["POST"])
 def calculate_properties():
     data = request.get_json()
     debug = bool(data.get("debug", False))
@@ -252,7 +252,7 @@ def calculate_properties():
         app.logger.error(traceback.format_exc())
         return jsonify({"error": "An internal error occurred.", "details": str(e)}), 500
 
-@peptideiq.route("/export_pdf")
+@peptalyzer.route("/export_pdf")
 def export_pdf():
     global latest_results
 
@@ -281,7 +281,7 @@ def export_pdf():
     except Exception as e:
         return f"Error generating PDF: {e}", 500
 
-app.register_blueprint(peptideiq)
+app.register_blueprint(peptalyzer)
 
 from flask import redirect
 

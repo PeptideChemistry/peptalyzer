@@ -190,8 +190,8 @@ interInput.addEventListener("input", disableExportButtons);
   });
 
   exportPdfBtn.addEventListener("click", () => {
-    const pathPrefix = "/peptideiq/app/";
-    window.location.href = `${pathPrefix}export_pdf`;
+    const pathPrefix = "/peptalyzer/app/";
+    window.location.href = "/peptalyzer/app/export_pdf";
   });
 
   form.addEventListener("submit", async (e) => {
@@ -216,7 +216,7 @@ interInput.addEventListener("input", disableExportButtons);
       : window.location.pathname + '/';
 
     try {
-      const response = await fetch(`${pathPrefix}calculate`, {
+      const response = await fetch("/peptalyzer/app/calculate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

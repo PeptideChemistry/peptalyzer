@@ -4,30 +4,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PeptideIQ – Free Online Peptide Calculator for Mass, pI, Charge, Hydropathy</title>
+  <title>Peptalyzer™ – Free Online Peptide Calculator for Mass, pI, Charge, Hydropathy</title>
 
   <!-- Meta description for search engines -->
-  <meta name="description" content="Use PeptideIQ to calculate peptide molecular weight, isoelectric point (pI), charge, hydropathy, extinction coefficient, and more. Free scientific peptide analysis tool.">
+  <meta name="description" content="Use Peptalyzer™ to calculate peptide molecular weight...">
   <!-- SEO keywords -->
   <meta name="keywords" content="peptide calculator, peptide properties, peptide visualization, peptide synthesis, peptide sequence analysis, peptide tools">
 
   <!-- Favicon -->
-  <link rel="icon" href="{{ url_for('peptideiq.static', filename='favicon.ico') }}">
+  <link rel="icon" href="{{ url_for('peptalyzer.static', filename='favicon.ico') }}">
 
   <!-- Roboto font -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Custom stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('peptideiq.static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('peptalyzer.static', filename='css/style.css') }}">
 </head>
 
 <body>
   <!-- ===== PeptideIQ Header ===== -->
   <div style="display: flex; align-items: center;">
-    <img class="peptide-logo" src="{{ url_for('peptideiq.static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="PeptideChemistry Logo">
+    <img class="peptide-logo" src="{{ url_for('peptalyzer.static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Peptalyzer™ Logo">
     <h1 style="font-size: 32px; color: #1e90ff; font-family: 'Roboto', sans-serif; margin: 0;">
-      Peptide<span style="color: #333; font-weight: bold;">IQ</span>
+      Peptalyzer<span style="font-size: 16px; color: #333; font-weight: normal; vertical-align: super;">™</span>
     </h1>
+
   </div>
 
   <main class="main-content">
@@ -90,12 +91,12 @@
         <div class="export-buttons">
             <!-- CSV Export Button with Icon -->
             <button id="exportCsvBtn" disabled data-tooltip="Export CSV">
-                <img src="{{ url_for('peptideiq.static', filename='icons/csv-icon.svg') }}">
+                <img src="{{ url_for('peptalyzer.static', filename='icons/csv-icon.svg') }}">
             </button>
 
             <!-- PDF Export Button with Icon -->
             <button id="exportPdfBtn" disabled data-tooltip="Export PDF">
-                <img src="{{ url_for('peptideiq.static', filename='icons/pdf-icon.svg') }}">
+                <img src="{{ url_for('peptalyzer.static', filename='icons/pdf-icon.svg') }}">
             </button>
         </div>
 
@@ -260,7 +261,7 @@
   </main>
 
   <!-- Link to JavaScript file controlling form submission and dynamic updates -->
-  <script src="{{ url_for('peptideiq.static', filename='js/script.js') }}"></script>
+  <script src="{{ url_for('peptalyzer.static', filename='js/script.js') }}"></script>
 
   <!-- ===== Footer Section ===== -->
   <footer style="margin-top: 50px; text-align: center; padding: 20px; font-family: 'Roboto', sans-serif; color: #333;">
@@ -272,11 +273,11 @@
       </p>
       <p>
           For detailed explanations of all calculations, visit our 
-          <a href="https://peptidechemistry.org/peptideiq/resources" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
+          <a href="https://peptidechemistry.org/peptalyzer/resources" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
               resources page
           </a>.
       </p>
-      <p style="font-size: 14px; color: #777;">PeptideIQ Version: <span id="appVersion">1.0.0</span></p>
+      <p style="font-size: 14px; color: #777;">Peptalyzer™ Version: <span id="appVersion">1.0.0</span></p>
   </footer>
 
 </body>
