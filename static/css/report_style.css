@@ -87,13 +87,4 @@ section {
   img, table {
     page-break-inside: avoid;
   }
-
-  /* Section page breaks */
-  section {
-    page-break-before: always;
-  }
-
-  section:first-of-type {
-    page-break-before: auto;
-  }
 }

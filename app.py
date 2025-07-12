@@ -42,6 +42,11 @@ import io
 import base64
 
 app = Flask(__name__)
+@app.template_filter('datetimeformat')
+def datetimeformat(value):
+    from datetime import datetime
+    dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    return dt.strftime("%B %d, %Y at %H:%M")
 peptalyzer = Blueprint(
     'peptalyzer',
     __name__,

@@ -21,10 +21,10 @@
 <body>
 
 <header>
-    <img src="https://peptidechemistry.org/static/icons/PeptideChemistry_Logo.svg" alt="Peptalyzer Logo" style="height: 60px;">
+    <img src="{{ url_for('static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Peptalyzer Logo" style="height: 60px;">
     <h1>Peptalyzer™ Report</h1>
     <p><a href="https://peptidechemistry.org" style="color: #1e90ff;">peptidechemistry.org</a></p>
-    <p><strong>Report Date:</strong> {{ data.timestamp }}</p>
+    <p><strong>Last Calculation:</strong> {{ data.timestamp | datetimeformat }}</p>
 </header>
 
 <section>
@@ -101,6 +101,7 @@
 <footer>
     <p>Peptalyzer™ Version: 1.0.0</p>
     <p><a href="https://peptidechemistry.org/contact/">Contact Support</a> | <a href="https://peptidechemistry.org/peptalyzer/resources">Resources</a></p>
+    <p>© 2025 • Peptide Chemistry</p>
 </footer>
 
 </body>
