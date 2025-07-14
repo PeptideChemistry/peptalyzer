@@ -126,11 +126,11 @@ HYDROPATHY_HOPP_WOODS = {
 
 # 🔌 Binding affinity estimates (Boman Index, kcal/mol, from Radzicka & Wolfenden (1988))
 AA_BINDING_VALUES = {
-    'A': 1.6,   'R': -14.3, 'N': -7.5,  'D': -8.2,
-    'C': 2.0,   'Q': -6.5,  'E': -7.5,  'G': 1.0,
-    'H': -4.5,  'I': 4.8,   'L': 4.9,   'K': -10.5,
-    'M': 3.4,   'F': 4.7,   'P': -0.2,  'S': -3.1,
-    'T': -1.2,  'W': 1.6,   'Y': 0.7,   'V': 4.3
+    'A': 1.81, 'R': -14.92, 'N': -6.64, 'D': -8.72,
+    'C': 1.28, 'Q': -5.54,  'E': -6.81, 'G': 0.94,
+    'H': -4.66, 'I': 4.92,  'L': 4.92,  'K': -5.55,
+    'M': 2.35, 'F': 2.98,  'P': -0.94, 'S': -3.40,
+    'T': -2.57, 'W': 2.33,  'Y': -0.14, 'V': 4.04
 }
 
 # 🔥 Aliphatic index from hydrophobic side chains (Ikai, 1980)
@@ -281,18 +281,18 @@ def calculate_boman_index(sequence):
     sequence = validate_sequence(sequence)
     if not sequence:
         return "0.000 kcal/mol (N/A)"
-    
-    # Flip the values (multiply by -1 to reflect binding potential)
+
     boman = -1 * sum(AA_BINDING_VALUES.get(aa, 0) for aa in sequence) / len(sequence)
-    rounded = round(boman, 3)
-    # Classification based on Boman's original threshold
-    if rounded < 1.0:
+
+    # Use unrounded value for classification
+    if boman < 1.0:
         rating = "Low"
-    elif rounded < 2.48:
+    elif boman < 2.48:
         rating = "Moderate"
     else:
         rating = "High"
-    return f"{rounded:.3f} kcal/mol ({rating})"
+
+    return f"{boman:.2f} kcal/mol ({rating})"
 
 # 🔥 Calculates aliphatic index using side-chain weights
 def calculate_aliphatic_index(sequence):
