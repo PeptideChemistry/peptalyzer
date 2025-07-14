@@ -124,13 +124,13 @@ HYDROPATHY_HOPP_WOODS = {
     'S': 0.3,  'T': 0.4,  'W': -3.4, 'Y': -2.3, 'V': -1.5
 }
 
-# 🔌 Binding affinity estimates (Boman Index, kcal/mol, from Kyte-Doolittle)
+# 🔌 Binding affinity estimates (Boman Index, kcal/mol, from Radzicka & Wolfenden (1988))
 AA_BINDING_VALUES = {
-    'A': 0.17, 'R': 0.81, 'N': 0.42, 'D': 0.19,
-    'C': 0.24, 'Q': 0.58, 'E': 0.21, 'G': 0.01,
-    'H': 0.70, 'I': 0.73, 'L': 0.53, 'K': 0.99,
-    'M': 0.44, 'F': 0.61, 'P': -0.07, 'S': 0.13,
-    'T': 0.14, 'W': 1.02, 'Y': 0.45, 'V': 0.54
+    'A': 1.6,   'R': -14.3, 'N': -7.5,  'D': -8.2,
+    'C': 2.0,   'Q': -6.5,  'E': -7.5,  'G': 1.0,
+    'H': -4.5,  'I': 4.8,   'L': 4.9,   'K': -10.5,
+    'M': 3.4,   'F': 4.7,   'P': -0.2,  'S': -3.1,
+    'T': -1.2,  'W': 1.6,   'Y': 0.7,   'V': 4.3
 }
 
 # 🔥 Aliphatic index from hydrophobic side chains (Ikai, 1980)
@@ -276,16 +276,19 @@ def estimate_secondary_structure(sequence):
         return {s: 0.0 for s in counts}
     return {s: round(100 * counts[s] / total, 2) for s in counts}
 
-# 💥Predicts protein-binding propensity (Boman Index)
+# 💥 Predicts protein-binding propensity (Boman Index using -ΔG)
 def calculate_boman_index(sequence):
     sequence = validate_sequence(sequence)
     if not sequence:
         return "0.000 kcal/mol (N/A)"
-    boman = sum(AA_BINDING_VALUES.get(aa, 0) for aa in sequence) / len(sequence)
+    
+    # Flip the values (multiply by -1 to reflect binding potential)
+    boman = -1 * sum(AA_BINDING_VALUES.get(aa, 0) for aa in sequence) / len(sequence)
     rounded = round(boman, 3)
+    # Classification based on Boman's original threshold
     if rounded < 1.0:
         rating = "Low"
-    elif rounded < 2.5:
+    elif rounded < 2.48:
         rating = "Moderate"
     else:
         rating = "High"
