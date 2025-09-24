@@ -478,3 +478,96 @@ button.loading {
     max-width: 80px;
   }
 }
+
+/* --- pH tooltip (Peptalyzer) --- */
+.ph-slider {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative; /* for absolute tooltip positioning */
+}
+
+.ph-info-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  padding: 0;
+  border: 1px solid var(--primary-blue);   /* #1E90FF */
+  background: #E6F2FF;                      /* light blue tint */
+  color: var(--primary-blue);
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+  cursor: help;
+  text-align: center;
+}
+
+.ph-info-badge:focus {
+  outline: 2px solid #F1C40F;               /* Accent focus ring */
+  outline-offset: 2px;
+}
+
+.ph-tooltip {
+  position: absolute;
+  left: calc(100% + 10px);  /* to the right of the slider group */
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 280px;
+  max-width: 340px;
+  background: var(--light-gray);            /* #F9F9F9 */
+  color: var(--dark-gray);                  /* #333333 */
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  z-index: 50;
+
+  /* hidden by default */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms ease-in-out, visibility 120ms ease-in-out;
+}
+
+/* show on hover or keyboard focus */
+.ph-info-badge:hover + .ph-tooltip,
+.ph-info-badge:focus + .ph-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* pointer triangle */
+.ph-info-badge + .ph-tooltip::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent #ddd transparent transparent;
+}
+.ph-info-badge + .ph-tooltip::after {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent var(--light-gray) transparent transparent;
+}
+
+/* Mobile: position tooltip below */
+@media (max-width: 640px) {
+  .ph-tooltip {
+    left: 0;
+    right: auto;
+    top: calc(100% + 8px);
+    transform: none;
+  }
+  .ph-info-badge + .ph-tooltip::before,
+  .ph-info-badge + .ph-tooltip::after {
+    display: none;
+  }
+}
