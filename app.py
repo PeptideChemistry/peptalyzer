@@ -65,7 +65,9 @@ def index():
 @peptalyzer.route("/calculate", methods=["POST"])
 def calculate_properties():
     """Receive peptide input via JSON, calculate all relevant properties, and return them."""
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "Request body must be valid JSON with Content-Type: application/json"}), 400
     debug = bool(data.get("debug", False))
     pH_min = float(data.get("pH_min", 0.0))
     pH_max = float(data.get("pH_max", 14.0))
@@ -123,7 +125,7 @@ def calculate_properties():
         avg_mw = (base_avg_mw - (hydrogen_loss_per_monomer * 1.00794)) * peptide_units
 
         # Prepare hydropathy data
-        window_size = int(data.get("hydropathy_window", 5))  # default to 5
+        window_size = int(data.get("hydropathy_window", 9))  # default to 9
         y = smooth_hydropathy(sequence, window_size)
         y_hw = [HYDROPATHY_HOPP_WOODS.get(aa, 0) for aa in sequence]
 
@@ -231,6 +233,7 @@ def calculate_properties():
             "inter_disulfide_bonds": inter_disulfide_bonds,
             "peptide_state": peptide_state,
             "gravy_classification": gravy_classification,
+            "hydropathy_window": window_size,
             "secondary_structure": secondary_structure,
             "boman_index": boman,
             "aliphatic_index": aliphatic_index,

@@ -26,6 +26,7 @@ def validate_input(data):
 
     if intra_disulfide_bonds < 0 or inter_disulfide_bonds < 0:
         return False, "Disulfide bond counts cannot be negative."
+    return True, "Input is valid."
 
     # ===== Count cysteines in sequence =====
     cys_count = sequence.count("C")
@@ -66,8 +67,10 @@ def validate_input(data):
         return False, f"Unknown C-terminal modification: {c_term}"
 
     # ===== Validate hydropathy window =====
-    window_size = int(data.get("hydropathy_window", 5))
-    if window_size <= 0:
-        return False, "Hydropathy window must be greater than 0."
+    try:
+        window_size = int(data.get("hydropathy_window", 9))  # default now 9 to match KD/ProtScale defaults
+    except (TypeError, ValueError):
+        return False, "Hydropathy window must be an integer."
 
-    return True, "Input is valid."
+    if window_size < 1:
+        return False, "Hydropathy window must be ≥ 1."

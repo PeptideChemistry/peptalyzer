@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const phValueDisplay = document.getElementById("phValue");
   const calcButton = document.getElementById("calcButton");
   const exportCsvBtn = document.getElementById("exportCsvBtn");
+  const exportPdfBtn = document.getElementById("exportPdfBtn");
 
   // ====== Disable Export Buttons ======
   function disableExportButtons() {
@@ -129,9 +130,31 @@ interInput.addEventListener("input", disableExportButtons);
     document.getElementById("result-basic-count").textContent = data.charge_distribution.basic_count;
     document.getElementById("result-total-charged").textContent = data.total_charge_residues;
 
-    updateGraph("img[alt='Pie chart showing distribution of acidic and basic residues in the peptide']", data.charge_distribution_pie === "NO_DATA" ? null : data.charge_distribution_pie);
+    const cdNoData = data.charge_distribution_pie === "NO_DATA";
+    updateGraph(
+      "img[alt='Pie chart showing distribution of acidic and basic residues in the peptide']",
+      cdNoData ? null : data.charge_distribution_pie,
+      cdNoData ? "No charged residues detected" : "Graph will appear here"
+    );
+
     updateGraph("img[alt='Graph showing net charge of the peptide as a function of pH']", data.net_charge_plot);
-    updateGraph("img[alt='Bar graph showing Kyte-Doolittle hydropathy profile of the peptide']", data.hydropathy_plot);
+    // KD: show ProtScale-style notice if sequence is too short for the KD window
+    const usedWindow = data.hydropathy_window || 9;
+    const minLen = 2 * usedWindow;
+    const tooShortKD = data.length < minLen;
+
+    const kdNotice =
+      `Sorry. Your sequence should be at least ${minLen} residues long (twice the window size of ${usedWindow}). ` +
+      `Hydropathy profiles are unreliable below this length. For shorter peptides, use the GRAVY ` +
+      `(Grand Average of Hydropathicity) value instead.`;
+
+    updateGraph(
+      "img[alt='Bar graph showing Kyte-Doolittle hydropathy profile of the peptide']",
+      tooShortKD ? null : data.hydropathy_plot,
+      tooShortKD ? kdNotice : "Graph will appear here"
+    );
+
+    // HW: unchanged (no smoothing/window used in app.py)
     updateGraph("img[alt='Bar graph showing Hopp-Woods hydrophilicity profile of the peptide']", data.hopp_woods_plot);
 
     updateAminoAcidCountsTable(data.amino_acid_counts);
@@ -141,30 +164,100 @@ interInput.addEventListener("input", disableExportButtons);
   }
 
   function updateAminoAcidCountsTable(counts) {
-    const tableBody = document.querySelector("#aaCountsTable tbody");
-    tableBody.innerHTML = "";
+    const table = document.getElementById("aaCountsTable");
+    const thead = table.querySelector("thead");
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = "";
 
-    if (counts && Object.keys(counts).length > 0) {
-      for (const [aminoAcid, count] of Object.entries(counts)) {
-        const row = document.createElement("tr");
-        const aaCell = document.createElement("td");
-        aaCell.textContent = aminoAcid;
+    // ensure the header has 3 columns (adds "Percent [%]" if missing)
+    ensureAAHeaderHasPercent(thead);
 
-        const countCell = document.createElement("td");
-        countCell.textContent = count;
-
-        row.appendChild(aaCell);
-        row.appendChild(countCell);
-        tableBody.appendChild(row);
-      }
-    } else {
+    if (!counts || Object.keys(counts).length === 0) {
       const row = document.createElement("tr");
       const cell = document.createElement("td");
-      cell.colSpan = 2;
+      cell.colSpan = 3; // now 3 columns
       cell.textContent = "No amino acids found.";
       row.appendChild(cell);
-      tableBody.appendChild(row);
+      tbody.appendChild(row);
+      return;
     }
+
+    // total length for percent calculation (one decimal)
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+
+    // default alphabetical order (A→Z)
+    const entries = Object.entries(counts).sort((a, b) => a[0].localeCompare(b[0]));
+
+    for (const [aa, count] of entries) {
+      const pct = ((count / total) * 100).toFixed(1);
+
+      const tr = document.createElement("tr");
+      // store raw values for sorting
+      tr.innerHTML = `
+        <td data-type="str">${aa}</td>
+        <td data-type="num" data-value="${count}">${count}</td>
+        <td data-type="num" data-value="${pct}">${pct}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  
+  function ensureAAHeaderHasPercent(thead) {
+  if (!thead) return;
+  const headerRow = thead.querySelector("tr");
+  if (!headerRow) return;
+
+  const ths = headerRow.querySelectorAll("th");
+  // if header already has 3 cells, assume it's correct
+  if (ths.length >= 3) return;
+
+  // original headers are assumed to be: "Amino Acid", "Count"
+  const th = document.createElement("th");
+  th.textContent = "Percent [%]";
+  th.setAttribute("role", "button");
+  th.style.cursor = "pointer";
+  headerRow.appendChild(th);
+}
+
+function attachAATableSortHandlers(table) {
+  const thead = table.querySelector("thead");
+  if (!thead) return;
+  const ths = Array.from(thead.querySelectorAll("th"));
+
+  ths.forEach((th, index) => {
+    // make headers clickable for sorting
+    th.style.cursor = "pointer";
+    th.setAttribute("title", "Click to sort");
+    th.addEventListener("click", () => {
+      // toggle sort dir
+      const dir = th.dataset.sortDir === "asc" ? "desc" : "asc";
+      ths.forEach(h => delete h.dataset.sortDir); // clear others
+      th.dataset.sortDir = dir;
+
+      const tbody = table.querySelector("tbody");
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      const type = index === 0 ? "str" : "num"; // AA column is text; others numeric
+
+      rows.sort((r1, r2) => {
+        const c1 = r1.children[index];
+        const c2 = r2.children[index];
+        const v1 = type === "num" ? parseFloat(c1.dataset.value || c1.textContent) : c1.textContent;
+        const v2 = type === "num" ? parseFloat(c2.dataset.value || c2.textContent) : c2.textContent;
+        if (type === "num") {
+          return dir === "asc" ? v1 - v2 : v2 - v1;
+        } else {
+          return dir === "asc" ? v1.localeCompare(v2) : v2.localeCompare(v1);
+        }
+      });
+
+      // reattach in new order
+      rows.forEach(r => tbody.appendChild(r));
+    }, { passive: true });
+  });
+}
+
+
+    // add / refresh header click handlers for sorting
+    attachAATableSortHandlers(table);
   }
 
   exportCsvBtn.addEventListener("click", () => {
@@ -232,8 +325,18 @@ interInput.addEventListener("input", disableExportButtons);
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        alert(`Error: ${errorData.error}`);
+        let msg = "Server error.";
+        try {
+          const ct = response.headers.get("content-type") || "";
+          if (ct.includes("application/json")) {
+            const err = await response.json();
+            msg = err.details ? `${err.error}: ${err.details}` : (err.error || msg);
+          } else {
+            const text = await response.text();
+            msg = text || msg;
+          }
+        } catch (_) { /* ignore parse errors */ }
+        alert(`Error: ${msg}`);
         return;
       }
 

@@ -121,7 +121,7 @@ HYDROPATHY_HOPP_WOODS = {
     'A': -0.5, 'R': 3.0,  'N': 0.2,  'D': 3.0,  'C': -1.0,
     'E': 3.0,  'Q': 0.2,  'G': 0.0,  'H': -0.5, 'I': -1.8,
     'L': -1.8, 'K': 3.0,  'M': -1.3, 'F': -2.5, 'P': 0.0,
-    'S': 0.3,  'T': 0.4,  'W': -3.4, 'Y': -2.3, 'V': -1.5
+    'S': 0.3,  'T': -0.4,  'W': -3.4, 'Y': -2.3, 'V': -1.5
 }
 
 # 🔌 Binding affinity estimates (Boman Index, kcal/mol, from Radzicka & Wolfenden (1988))
@@ -174,6 +174,49 @@ RESIDUE_COLORS = {
 # 🔧 FUNCTION DEFINITIONS
 # ================================
 
+def _smooth_scale(sequence: str, scale_dict: dict, window_size: int = 9, weights: str = "uniform"):
+    """
+    - No zero padding
+    - Truncated window near edges
+    - Normalize by weights actually used at each position
+    - Output length == sequence length
+    - weights: "uniform" (default) or "linear" (aka triangular)
+    """
+    sequence = validate_sequence(sequence)
+    n = len(sequence)
+    if n == 0:
+        return []
+
+    if window_size < 1:
+        window_size = 1
+
+    vals = np.array([scale_dict.get(aa, 0.0) for aa in sequence], dtype=float)
+
+    # build weights
+    w = np.ones(window_size, dtype=float)
+    if weights in ("linear", "triangular"):
+        half = window_size // 2
+        left = np.arange(1, half + 1)
+        if window_size % 2 == 1:
+            center = np.array([half + 1])
+            w = np.concatenate([left, center, left[::-1]])
+        else:
+            w = np.concatenate([left, left[::-1]])
+
+    half = window_size // 2
+    out = []
+    for i in range(n):
+        lo = max(0, i - half)         # inclusive
+        hi = min(n, i + half + 1)     # exclusive
+        # slice weights to match truncated window
+        w_lo = half - (i - lo)
+        w_hi = w_lo + (hi - lo)
+        w_slice = w[w_lo:w_hi]
+        num = (vals[lo:hi] * w_slice).sum()
+        den = w_slice.sum()
+        out.append(num / den)  # keep full precision
+    return out
+
 # 🧬 Checks for invalid amino acids in input sequence
 def validate_sequence(sequence):
     sequence = sequence.upper()
@@ -213,25 +256,12 @@ def calculate_monoisotopic_mass(sequence, n_term="H", c_term="OH"):
     return round(base_mass + n_shift + c_shift, 4)
 
 # 📈 Returns smoothed hydropathy profile using sliding window
-def smooth_hydropathy(sequence, window_size=5):
-    sequence = validate_sequence(sequence)
-    if window_size < 1:
-        window_size = 1
+def smooth_hydropathy(sequence, window_size=9, weights="uniform"):
+    return _smooth_scale(sequence, HYDROPATHY, window_size=window_size, weights=weights)
 
-    values = np.array([HYDROPATHY.get(aa, 0) for aa in sequence])
-
-    if window_size > len(sequence):
-        # When the window is larger than the sequence, use the average value
-        avg_value = np.mean(values) if len(values) > 0 else 0
-        smoothed = np.array([avg_value] * len(sequence))
-    else:
-        kernel = np.ones(window_size) / window_size
-        smoothed = np.convolve(values, kernel, mode='same')
-
-    return [round(v, 2) for v in smoothed]
 
 # 📈 Returns smoothed Hopp-Woods hydropathy profile using sliding window
-def smooth_hopp_woods_hydropathy(sequence, window_size=5):
+def smooth_hopp_woods_hydropathy(sequence, window_size=6):
     sequence = validate_sequence(sequence)
     if window_size < 1:
         window_size = 1
