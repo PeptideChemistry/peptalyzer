@@ -79,11 +79,11 @@
       </tr>
     </thead>
     <tbody>
-        {% for aa, info in data.amino_acid_counts.items() %}
+        {% for aa, count in data.amino_acid_counts.items()|sort %}
         <tr>
           <td>{{ aa }}</td>
-          <td>{{ info.count }}</td>
-          <td>{{ info.percent }}%</td>
+          <td>{{ count }}</td>
+          <td>{{ "%.1f"|format(count / data.length * 100) }}%</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -111,7 +111,7 @@
 </section>
 
 <footer class="report-footer">
-  <p>Peptalyzer™ Version: 1.2.0</p>
+  <p>Peptalyzer™ Version: 1.2.1</p>
   <p><a href="https://peptidechemistry.org/contact/">Contact Support</a> | <a href="https://peptidechemistry.org/peptalyzer/resources">Resources</a></p>
   <p>© 2025 • Peptide Chemistry</p>
 </footer>

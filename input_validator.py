@@ -26,7 +26,6 @@ def validate_input(data):
 
     if intra_disulfide_bonds < 0 or inter_disulfide_bonds < 0:
         return False, "Disulfide bond counts cannot be negative."
-    return True, "Input is valid."
 
     # ===== Count cysteines in sequence =====
     cys_count = sequence.count("C")
@@ -74,3 +73,5 @@ def validate_input(data):
 
     if window_size < 1:
         return False, "Hydropathy window must be ≥ 1."
+
+    return True, "Input is valid."

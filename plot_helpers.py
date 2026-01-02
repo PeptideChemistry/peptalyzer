@@ -101,9 +101,6 @@ def generate_net_charge_plot(ph_values, charges_dict, pI_ipc2):
 
 # 🥧 Charge Distribution Pie Chart (Flat, No Branding)
 def generate_charge_distribution_pie(acidic_count, basic_count):
-    import matplotlib.pyplot as plt
-    import numpy as np
-
     if acidic_count == 0 and basic_count == 0:
         return "NO_DATA"
 

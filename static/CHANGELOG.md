@@ -4,6 +4,19 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.1] - 2026-01-02
+### Fixed
+- **Critical Chemistry Logic**: Corrected `calculate_net_charge` to include Cysteine (C) as an ionizable acidic residue. Previous versions treated it as neutral in specific calculation paths.
+- **Concurrency/State Management**: Replaced global state with a unique ID system (`CALCULATION_CACHE`) to prevent users from overwriting each other's reports.
+- **Input Validation**: Fixed a bug in `input_validator.py` where a premature return caused most validation checks (pH range, Cysteine counts) to be skipped.
+- **PDF Report**: Fixed missing "Selected pH" value and corrected the Amino Acid Composition table to properly display counts and percentages.
+- **Frontend Performance**: Fixed an issue where sorting event listeners were duplicated on every calculation, and optimized disulfide bond constraint logic.
+
+### Changed
+- **Code Architecture**: Refactored `app.py` to separate business logic from request handling.
+- **Aliphatic Index**: Updated formula to strictly match the Ikai (1980) standard.
+- **Hydropathy Plots**: Standardized smoothing logic for Hopp-Woods plots to handle edge cases consistently with Kyte-Doolittle.
+
 ## [1.2.0] - 2026-01-02
 ### Added
 - **Multi-Scale pI Comparison**

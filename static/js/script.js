@@ -13,6 +13,43 @@ document.addEventListener("DOMContentLoaded", () => {
     exportPdfBtn.disabled = true;
   }
 
+  // ====== Disulfide Bond Constraint Logic ======
+  function updateDisulfideConstraints() {
+    const sequence = sequenceInput.value.toUpperCase();
+    const cysCount = (sequence.match(/C/g) || []).length;
+    const currentIntra = parseInt(intraInput.value, 10) || 0;
+
+    if (cysCount === 0) {
+      intraInput.value = 0;
+      interInput.value = 0;
+      intraInput.disabled = true;
+      interInput.disabled = true;
+    } else {
+      intraInput.disabled = false;
+      interInput.disabled = false;
+
+      // 1. Calculate max Intra bonds allowed (2 Cys per bond)
+      const maxIntraBonds = Math.floor(cysCount / 2);
+      
+      // Clamp Intra value if it exceeds new max
+      if (currentIntra > maxIntraBonds) {
+        intraInput.value = maxIntraBonds;
+      }
+      intraInput.max = maxIntraBonds;
+
+      // 2. Calculate remaining Cys for Inter bonds
+      // (Use the potentially clamped value from above)
+      const usedCysForIntra = (parseInt(intraInput.value, 10) || 0) * 2;
+      const remainingCys = cysCount - usedCysForIntra;
+      const maxInterBonds = remainingCys;
+
+      if (parseInt(interInput.value, 10) > maxInterBonds) {
+        interInput.value = maxInterBonds;
+      }
+      interInput.max = maxInterBonds;
+    }
+  }
+
   // ====== New DOM Elements for Disulfide Bonds ======
   const intraInput = document.getElementById("intra_disulfide_bonds");
   const interInput = document.getElementById("inter_disulfide_bonds");
@@ -29,39 +66,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // ====== Real-Time Cysteine Validation ======
   sequenceInput.addEventListener("input", () => {
     disableExportButtons();
-
-    const sequence = sequenceInput.value.toUpperCase();
-    const cysCount = (sequence.match(/C/g) || []).length;
-
-    if (cysCount === 0) {
-      intraInput.value = 0;
-      interInput.value = 0;
-      intraInput.disabled = true;
-      interInput.disabled = true;
-    } else {
-      intraInput.disabled = false;
-      interInput.disabled = false;
-
-      const maxIntraBonds = Math.floor(cysCount / 2);
-      if (parseInt(intraInput.value, 10) > maxIntraBonds) {
-        intraInput.value = maxIntraBonds;
-      }
-      intraInput.max = maxIntraBonds;
-
-      const remainingCys = cysCount - (parseInt(intraInput.value, 10) * 2);
-      const maxInterBonds = remainingCys;
-
-      if (parseInt(interInput.value, 10) > maxInterBonds) {
-        interInput.value = maxInterBonds;
-      }
-      interInput.max = maxInterBonds;
-    }
+    updateDisulfideConstraints();
   });
 
 // ====== Additional Export Disable Triggers ======
 document.getElementById("n_term").addEventListener("change", disableExportButtons);
 document.getElementById("c_term").addEventListener("change", disableExportButtons);
-intraInput.addEventListener("input", disableExportButtons);
+intraInput.addEventListener("input", () => {
+  disableExportButtons();
+  updateDisulfideConstraints();
+});
 interInput.addEventListener("input", disableExportButtons);
 
   // ====== Graph Reset Utility ======
@@ -173,9 +187,6 @@ interInput.addEventListener("input", disableExportButtons);
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = "";
 
-    // ensure the header has 3 columns (adds "Percent [%]" if missing)
-    ensureAAHeaderHasPercent(thead);
-
     if (!counts || Object.keys(counts).length === 0) {
       const row = document.createElement("tr");
       const cell = document.createElement("td");
@@ -204,25 +215,7 @@ interInput.addEventListener("input", disableExportButtons);
       `;
       tbody.appendChild(tr);
     }
-    attachAATableSortHandlers(table);
-   }
-  function ensureAAHeaderHasPercent(thead) {
-  if (!thead) return;
-  const headerRow = thead.querySelector("tr");
-  if (!headerRow) return;
-
-  const ths = headerRow.querySelectorAll("th");
-  // if header already has 3 cells, assume it's correct
-  if (ths.length >= 3) return;
-
-  // original headers are assumed to be: "Amino Acid", "Count"
-  const th = document.createElement("th");
-  th.textContent = "Percent [%]";
-  th.setAttribute("role", "button");
-  th.style.cursor = "pointer";
-  headerRow.appendChild(th);
-}
-
+  }
 function attachAATableSortHandlers(table) {
   const thead = table.querySelector("thead");
   if (!thead) return;
@@ -260,6 +253,10 @@ function attachAATableSortHandlers(table) {
   });
 }
 
+  // Attach sort handlers once on load (since headers are static in HTML)
+  const aaTable = document.getElementById("aaCountsTable");
+  if (aaTable) attachAATableSortHandlers(aaTable);
+
   exportCsvBtn.addEventListener("click", () => {
     const rows = document.querySelectorAll("#resultsTable tr");
     let csvContent = "";
@@ -283,7 +280,10 @@ function attachAATableSortHandlers(table) {
   });
 
   exportPdfBtn.addEventListener("click", () => {
-    window.open("/peptalyzer/app/report/preview", "_blank");
+    const reportId = exportPdfBtn.dataset.reportId;
+    if (reportId) {
+      window.open(`/peptalyzer/app/report/preview?id=${reportId}`, "_blank");
+    }
   });
 
   form.addEventListener("submit", async (e) => {
@@ -307,11 +307,6 @@ function attachAATableSortHandlers(table) {
     const selected_pH = parseFloat(phInput.value);
     const intra_disulfide_bonds = parseInt(document.getElementById("intra_disulfide_bonds").value, 10);
     const inter_disulfide_bonds = parseInt(document.getElementById("inter_disulfide_bonds").value, 10);
-
-    // ✅ Add this:
-    const pathPrefix = window.location.pathname.endsWith('/')
-      ? window.location.pathname
-      : window.location.pathname + '/';
 
     try {
       const response = await fetch("/peptalyzer/app/calculate", {
@@ -347,6 +342,10 @@ function attachAATableSortHandlers(table) {
       }
 
       const data = await response.json();
+
+      // Store the report ID on the button for the click handler to use
+      if (data.report_id) exportPdfBtn.dataset.reportId = data.report_id;
+
       updateResults(data);
 
       // Enable export buttons

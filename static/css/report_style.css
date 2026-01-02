@@ -1,16 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
+:root {
+  --primary-blue: #1e90ff;
+  --text-color: #333;
+  --bg-color: white;
+  --border-color: #ccc;
+}
+
 body {
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   margin: 20mm;
-  color: #333;
-  background: white;
+  color: var(--text-color);
+  background: var(--bg-color);
   line-height: 1.5;
 }
 
 h1, h2, h3 {
-  color: #1e90ff;
+  color: var(--primary-blue);
   margin-bottom: 5px;
   font-weight: bold;
 }
@@ -23,6 +30,7 @@ h1 {
 h2 {
   font-size: 14px;
   margin-top: 20px;
+  page-break-after: avoid; /* Keep header attached to the section content */
 }
 
 .subtitle {
@@ -50,7 +58,7 @@ h2 {
 
 section {
   margin-bottom: 25px;
-  page-break-inside: avoid;
+  /* Removed 'page-break-inside: avoid' to allow long tables to span multiple pages */
 }
 
 .page-break {
@@ -66,14 +74,14 @@ table {
 }
 
 th, td {
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   padding: 5px;
   text-align: left;
   vertical-align: top;
 }
 
 thead th {
-  background-color: #1e90ff;
+  background-color: var(--primary-blue);
   color: white;
   font-weight: bold;
   text-align: center;
@@ -81,6 +89,10 @@ thead th {
 
 tbody tr:nth-child(even) {
   background-color: #f9f9f9;
+}
+
+tr {
+  page-break-inside: avoid; /* Prevent rows from being sliced in half across pages */
 }
 
 img {

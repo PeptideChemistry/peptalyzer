@@ -146,11 +146,6 @@ AA_BINDING_VALUES = {
     'T': -2.57, 'W': 2.33,  'Y': -0.14, 'V': 4.04
 }
 
-# 🔥 Aliphatic index from hydrophobic side chains (Ikai, 1980)
-ALIPHATIC_WEIGHTS = {
-    'A': 0.0, 'V': 1.0, 'I': 2.9, 'L': 3.9
-}
-
 # ⚙️ Thresholds for hydropathy interpretation (used in GRAVY score)
 GRAVY_THRESHOLDS = {
     "hydrophilic_limit": -0.5,
@@ -187,7 +182,7 @@ RESIDUE_COLORS = {
 # 🔧 FUNCTION DEFINITIONS
 # ================================
 
-def _smooth_scale(sequence: str, scale_dict: dict, window_size: int = 9, weights: str = "uniform"):
+def _smooth_scale(sequence: str, scale_dict: dict, window_size: int = 9, weights: str = "uniform") -> list:
     """
     - No zero padding
     - Truncated window near edges
@@ -231,7 +226,7 @@ def _smooth_scale(sequence: str, scale_dict: dict, window_size: int = 9, weights
     return out
 
 # 🧬 Checks for invalid amino acids in input sequence
-def validate_sequence(sequence):
+def validate_sequence(sequence: str) -> str:
     sequence = sequence.upper()
     invalid = [aa for aa in sequence if aa not in VALID_AMINO_ACIDS]
     if invalid:
@@ -239,18 +234,20 @@ def validate_sequence(sequence):
     return sequence
 
 # ⚡ Computes net charge at specified pH with terminal mods
-def calculate_net_charge(sequence, pH, n_term_type="H", c_term_type="OH", scale_name="IPC2_peptide"):
+def calculate_net_charge(sequence: str, pH: float, n_term_type: str = "H", c_term_type: str = "OH", scale_name: str = "IPC2_peptide") -> float:
     pka_set = PKA_SCALES.get(scale_name, PKA_SCALES["IPC2_peptide"])
     net_charge = 0.0
 
     # 1. Side Chain Charges Only
     for aa in sequence:        
         pKa = pka_set.get(aa)
-        if pKa is not None:
-            # Side chains only (pKa < 7 is D, E, Y; pKa > 7 is H, K, R)
-            if aa in ['D', 'E', 'Y']:
+        if pKa is not None and aa in IONIZABLE_RESIDUES:
+            # Use the dictionary to determine charge type instead of hardcoded lists
+            # This fixes the bug where Cysteine (C) was previously ignored
+            charge_type = IONIZABLE_RESIDUES[aa]
+            if charge_type == 'acidic':
                 net_charge -= 1 / (1 + 10**(pKa - pH))
-            elif aa in ['H', 'K', 'R']:
+            elif charge_type == 'basic':
                 net_charge += 1 / (1 + 10**(pH - pKa))
 
     # 2. Strict Terminal Charges
@@ -263,7 +260,7 @@ def calculate_net_charge(sequence, pH, n_term_type="H", c_term_type="OH", scale_
     return net_charge
 
 # 🧮 Computes average molecular weight with terminal mods
-def calculate_average_mass(sequence, n_term="H", c_term="OH"):
+def calculate_average_mass(sequence: str, n_term: str = "H", c_term: str = "OH") -> float:
     sequence = validate_sequence(sequence)
     base_mass = sum(AVERAGE_MASS.get(aa, 0.0) for aa in sequence)
     n_shift = N_TERM_MODIFICATIONS[n_term]["average_mass_shift"]
@@ -271,37 +268,27 @@ def calculate_average_mass(sequence, n_term="H", c_term="OH"):
     return round(base_mass + n_shift + c_shift, 4)
 
 # 🧮 Computes monoisotopic mass with terminal mods
-def calculate_monoisotopic_mass(sequence, n_term="H", c_term="OH"):
+def calculate_monoisotopic_mass(sequence: str, n_term: str = "H", c_term: str = "OH") -> float:
     base_mass = sum(MONOISOTOPIC_MASS.get(aa, 0) for aa in sequence)
     n_shift = N_TERM_MODIFICATIONS[n_term]["monoisotopic_mass_shift"]
     c_shift = C_TERM_MODIFICATIONS[c_term]["monoisotopic_mass_shift"]
     return round(base_mass + n_shift + c_shift, 4)
 
 # 📈 Returns smoothed hydropathy profile using sliding window
-def smooth_hydropathy(sequence, window_size=9, weights="uniform"):
+def smooth_hydropathy(sequence: str, window_size: int = 9, weights: str = "uniform") -> list:
     return _smooth_scale(sequence, HYDROPATHY, window_size=window_size, weights=weights)
 
 
 # 📈 Returns smoothed Hopp-Woods hydropathy profile using sliding window
-def smooth_hopp_woods_hydropathy(sequence, window_size=6):
-    sequence = validate_sequence(sequence)
-    if window_size < 1:
-        window_size = 1
-
-    values = np.array([HYDROPATHY_HOPP_WOODS.get(aa, 0) for aa in sequence])
-
-    if window_size > len(sequence):
-        # When the window is larger than the sequence, use the average value
-        avg_value = np.mean(values) if len(values) > 0 else 0
-        smoothed = np.array([avg_value] * len(sequence))
-    else:
-        kernel = np.ones(window_size) / window_size
-        smoothed = np.convolve(values, kernel, mode='same')
-
+def smooth_hopp_woods_hydropathy(sequence: str, window_size: int = 6) -> list:
+    # Reuse the robust smoothing logic from _smooth_scale
+    # Note: _smooth_scale handles validation, window < 1, and edge cases (truncation)
+    # better than simple convolution, preventing artificial drops to zero at termini.
+    smoothed = _smooth_scale(sequence, HYDROPATHY_HOPP_WOODS, window_size=window_size, weights="uniform")
     return [round(v, 2) for v in smoothed]
 
 # 🌊 Labels peptide as polar/nonpolar based on hydropathy and charge
-def classify_peptide_polarity(sequence):
+def classify_peptide_polarity(sequence: str) -> str:
     sequence = validate_sequence(sequence)
     hydrophobicity = sum(HYDROPATHY.get(aa, 0) for aa in sequence)
     charged_residues = sum(1 for aa in sequence if aa in {'D', 'E', 'R', 'K', 'H'})
@@ -316,7 +303,7 @@ def classify_peptide_polarity(sequence):
         return "intermediate"
 
 #  🧠 Predicts structural bias (secondary structure) using Chou-Fasman propensities
-def estimate_secondary_structure(sequence):
+def estimate_secondary_structure(sequence: str) -> dict:
     sequence = validate_sequence(sequence)
     counts = {'helix': 0.0, 'sheet': 0.0, 'coil': 0.0}
     for aa in sequence:
@@ -329,7 +316,7 @@ def estimate_secondary_structure(sequence):
     return {s: round(100 * counts[s] / total, 2) for s in counts}
 
 # 💥 Predicts protein-binding propensity (Boman Index using -ΔG)
-def calculate_boman_index(sequence):
+def calculate_boman_index(sequence: str) -> str:
     sequence = validate_sequence(sequence)
     if not sequence:
         return "0.000 kcal/mol (N/A)"
@@ -347,7 +334,7 @@ def calculate_boman_index(sequence):
     return f"{boman:.2f} kcal/mol ({rating})"
 
 # 🔥 Calculates aliphatic index using side-chain weights
-def calculate_aliphatic_index(sequence):
+def calculate_aliphatic_index(sequence: str) -> dict:
     sequence = validate_sequence(sequence)
     if not sequence:
         return {"value": 0.0, "rating": "N/A"}
@@ -355,12 +342,13 @@ def calculate_aliphatic_index(sequence):
     length = len(sequence)
     counts = Counter(sequence)
 
+    # Standard Ikai (1980) formula: X_A + 2.9*X_V + 3.9*(X_I + X_L)
+    X_A = counts.get('A', 0) / length
     X_V = counts.get('V', 0) / length
     X_I = counts.get('I', 0) / length
     X_L = counts.get('L', 0) / length
-    X_M = counts.get('M', 0) / length
 
-    aliphatic_index = round(100 * (X_V * 1.0 + X_I * 2.9 + X_L * 3.9 + X_M * 1.9), 2)
+    aliphatic_index = round(100 * (X_A * 1.0 + X_V * 2.9 + X_I * 3.9 + X_L * 3.9), 2)
 
     if aliphatic_index < 50:
         rating = "Low"
@@ -374,7 +362,7 @@ def calculate_aliphatic_index(sequence):
     return {"value": aliphatic_index, "rating": rating}
 
 # 💧 Calculates GRAVY score and hydropathy annotation
-def calculate_gravy_score(sequence):
+def calculate_gravy_score(sequence: str) -> dict:
     sequence = validate_sequence(sequence)
     if not sequence:
         return {"value": 0.0, "annotation": "N/A"}
@@ -394,7 +382,7 @@ def calculate_gravy_score(sequence):
 
 
 # 🧪 Empirical atomic formulas for peptide composition
-def calculate_molecular_formula(sequence, n_term="H", c_term="OH"):
+def calculate_molecular_formula(sequence: str, n_term: str = "H", c_term: str = "OH") -> dict:
     sequence = validate_sequence(sequence)
     amino_acid_formulas = {
         'A': {'C':3,'H':5,'N':1,'O':1}, 'R': {'C':6,'H':12,'N':4,'O':1}, 'N': {'C':4,'H':6,'N':2,'O':2},
@@ -429,34 +417,8 @@ def calculate_molecular_formula(sequence, n_term="H", c_term="OH"):
         "formatted": formatted
     }
 
-# ⚛️ Computes terminal charge contributions at pH (from mod + removes native charge if needed)
-def apply_terminal_modification_charge(pH, mod, is_n_term):
-    """
-    Calculate the charge contribution of an N- or C-terminal modification at a given pH.
-    Args:
-        pH (float): pH at which the calculation is made.
-        mod (dict): Modification dictionary.
-        is_n_term (bool): True if N-terminal, False if C-terminal.
-    Returns:
-        float: Charge contribution at the given pH.
-    """
-    total = 0.0
-    for group in mod.get("ionizable_groups", []):
-        pKa = group["pKa"]
-        acidic = group["acidic"]
-        charge = group.get("charge", 1)
-        if acidic:
-            # Acidic group (e.g., COOH)
-            fraction = 10 ** pH / (10 ** pKa + 10 ** pH)
-            total -= charge * fraction
-        else:
-            # Basic group (e.g., NH2)
-            fraction = 10 ** pKa / (10 ** pKa + 10 ** pH)
-            total += charge * fraction
-    return total
-
 # ⚖️ Estimates isoelectric point via bisection method
-def calculate_isoelectric_point(sequence, n_term="H", c_term="OH", scale_name="IPC2_peptide"):
+def calculate_isoelectric_point(sequence: str, n_term: str = "H", c_term: str = "OH", scale_name: str = "IPC2_peptide") -> float:
     """
     Calculates the isoelectric point of a peptide using the specified pKa scale.
     """
@@ -474,7 +436,7 @@ def calculate_isoelectric_point(sequence, n_term="H", c_term="OH", scale_name="I
             
     return round(mid, 3)
 
-def calculate_all_pis(sequence, n_term="H", c_term="OH"):
+def calculate_all_pis(sequence: str, n_term: str = "H", c_term: str = "OH") -> dict:
     """
     Calculates the isoelectric point using all three available scales.
     Returns a dictionary of results.
@@ -486,7 +448,7 @@ def calculate_all_pis(sequence, n_term="H", c_term="OH"):
     return results
 
 # 🧮 Counts the number of each amino acid in the sequence
-def count_amino_acids(sequence):
+def count_amino_acids(sequence: str) -> dict:
     sequence = validate_sequence(sequence)
     counts = Counter(sequence)
     # Keep only amino acids with counts > 0
@@ -496,7 +458,7 @@ def count_amino_acids(sequence):
 # ✅ String formatting utility 🔤
 # Adds HTML subscripts to numerical characters in a string.
 # Example: 'C6H12O6' ➜ 'C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>'
-def format_subscripts(text):
+def format_subscripts(text: str) -> str:
     """
     Adds HTML subscript tags to numbers in a string.
 
@@ -506,7 +468,7 @@ def format_subscripts(text):
     return re.sub(r'(\d+)', r'<sub>\1</sub>', text)
 
 # ⚡ Charge distribution calculator ⚡
-def calculate_charge_distribution(sequence):
+def calculate_charge_distribution(sequence: str) -> dict:
     """
     Calculates the number of acidic and basic residues in a peptide sequence.
 
@@ -520,7 +482,7 @@ def calculate_charge_distribution(sequence):
         "basic_count": sum(sequence.count(aa) for aa in basic_residues)
     }
 
-def format_molecular_formula(atom_counts):
+def format_molecular_formula(atom_counts: dict) -> str:
     """
     Formats the molecular formula dictionary into a standard string like C6H12O6.
 
@@ -536,7 +498,7 @@ def format_molecular_formula(atom_counts):
             formula += f"{atom}{count}"
     return formula
 
-def calculate_extinction_coefficient(sequence, total_disulfide_bonds, peptide_units=1):
+def calculate_extinction_coefficient(sequence: str, total_disulfide_bonds: int, peptide_units: int = 1) -> dict:
     """
     Calculates the extinction coefficient based on user-defined disulfide bonds and aromatic residues.
     Extinction coefficient is not scaled by the number of peptide units.
