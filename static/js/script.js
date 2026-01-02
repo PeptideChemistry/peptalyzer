@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("Peptalyzer v1.2.2 loaded");
   // ====== DOM Elements ======
   const form = document.getElementById("calcForm");
   const phInput = document.getElementById("phInput");

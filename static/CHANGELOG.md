@@ -4,6 +4,10 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.2] - 2026-01-02
+### Fixed
+- **Deployment**: Bumped static asset versions to force browser cache refresh and ensure all users receive the latest JavaScript logic for report generation.
+
 ## [1.2.1] - 2026-01-02
 ### Fixed
 - **Critical Chemistry Logic**: Corrected `calculate_net_charge` to include Cysteine (C) as an ionizable acidic residue. Previous versions treated it as neutral in specific calculation paths.
