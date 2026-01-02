@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Peptalyzer™ Report</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/report_style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('peptalyzer.static', filename='css/report_style.css') }}">
 </head>
 <body>
 
@@ -12,7 +12,7 @@
 </div>
 
 <div class="title-page">
-  <img class="logo" src="{{ url_for('static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Logo">
+  <img class="logo" src="{{ url_for('peptalyzer.static', filename='icons/PeptideChemistry_Logo.svg') }}" alt="Logo">
   <h1>Peptalyzer™ Report</h1>
   <p class="subtitle">peptidechemistry.org // Last Calculation: {{ data.timestamp | datetimeformat }}</p>
 </div>
