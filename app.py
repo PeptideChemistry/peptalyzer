@@ -21,6 +21,7 @@ from peptide_helpers import (
     calculate_charge_distribution,
     format_molecular_formula,
     calculate_extinction_coefficient,
+    calculate_all_pis,
     N_TERM_MODIFICATIONS,
     C_TERM_MODIFICATIONS,
     HYDROPATHY_HOPP_WOODS,
@@ -97,7 +98,7 @@ def calculate_properties():
     pH = float(data.get("pH", 7.0))
     n_term = data.get("n_term", "H")    # Default = free amine
     c_term = data.get("c_term", "OH")   # Default = carboxylic acid
-    net_charge_at_pH = round(calculate_net_charge(sequence, pH, n_term, c_term), 2)
+    net_charge_at_pH = round(calculate_net_charge(sequence, pH, n_term, c_term, "IPC2_peptide"), 2)
 
     # Step 1: Calculate base monoisotopic mass for one peptide unit
     base_mono_mw = calculate_monoisotopic_mass(sequence, n_term, c_term)
@@ -139,12 +140,27 @@ def calculate_properties():
         hopp_woods_base64 = generate_hopp_woods_plot(x, y_hw, colors_hw)
 
         # Net charge calculation
+        # 1. Define the pH range (0.0 to 14.0) for the plot
         ph_values = [round(pH_min + i * pH_step, 2) for i in range(int((pH_max - pH_min) / pH_step) + 1)]
-        net_charges = [round(calculate_net_charge(sequence, ph, n_term, c_term), 2) for ph in ph_values]
-        pI = calculate_isoelectric_point(sequence, n_term, c_term)
 
-        # Net charge plot
-        netcharge_base64 = generate_net_charge_plot(ph_values, net_charges, pI)
+        # 2. Calculate the three specific pI results
+        pi_results = calculate_all_pis(sequence, n_term, c_term)
+        pI_ipc2 = pi_results.get("IPC2_peptide", 0.0)
+        pI_bjellqvist = pi_results.get("Bjellqvist", 0.0)
+        pI_emboss = pi_results.get("EMBOSS", 0.0)
+        pI_lehninger = pi_results.get("Lehninger", 0.0)
+
+        # 3. Create a dictionary of charges for ALL three scales
+        # This allows the plot helper to draw three different colored lines
+        charges_dict = {
+            'ipc2': [calculate_net_charge(sequence, ph, n_term, c_term, "IPC2_peptide") for ph in ph_values],
+            'bjellqvist': [calculate_net_charge(sequence, ph, n_term, c_term, "Bjellqvist") for ph in ph_values],
+            'emboss': [calculate_net_charge(sequence, ph, n_term, c_term, "EMBOSS") for ph in ph_values],
+            'lehninger': [calculate_net_charge(sequence, ph, n_term, c_term, "Lehninger") for ph in ph_values]
+        }
+
+        # 4. Generate the multi-scale plot (Passes the dictionary instead of a single list)
+        netcharge_base64 = generate_net_charge_plot(ph_values, charges_dict, pI_ipc2)
 
         # Pie Chart or No Data Box
         acidic = charge_distribution['acidic_count']
@@ -152,7 +168,7 @@ def calculate_properties():
 
         charge_pie_base64 = generate_charge_distribution_pie(acidic, basic)
 
-        pI_value = pI
+        pI_value = pI_ipc2
         # Calculate monomer extinction coefficient (excluding cysteines)
         extinction_data = calculate_extinction_coefficient(sequence, total_disulfide_bonds, peptide_units)
 
@@ -189,7 +205,7 @@ def calculate_properties():
         if debug:
             debug_info = {
                 "ph_values": ph_values,
-                "net_charges": net_charges,
+                "net_charges": charges_dict['ipc2'],
                 "raw_extinction_coefficient": extinction_data,
                 "net_charge_at_input_pH": net_charge_at_pH,
                 "peptide_polarity": peptide_polarity
@@ -212,8 +228,21 @@ def calculate_properties():
             "terminal_modifications": f"{n_term_full} / {c_term_full}",
             "monoisotopic_mw": round(mono_mw, 4),
             "average_mw": round(avg_mw, 4),
+            "pI": pI_ipc2,
+            "pI_ipc2": pI_ipc2,
+            "pI_bjellqvist": pI_bjellqvist,
+            "pI_emboss": pI_emboss,
+            "pI_lehninger": pI_lehninger,
             "amino_acid_counts": amino_acid_counts,
-            "isoelectric_point": pI,
+            "isoelectric_point": pI_ipc2,
+
+            # The nested dictionary for the PDF Report
+            "pi_scales": {
+                "bjellqvist": pI_bjellqvist,
+                "emboss": pI_emboss,
+                "lehninger": pI_lehninger
+            },
+
             "charge_at_pH": net_charge_at_pH,
             "n_term": n_term,
             "c_term": c_term,

@@ -80,7 +80,7 @@
           <span role="tooltip" id="ph-tooltip" class="ph-tooltip">
             <strong>What this pH affects?</strong><br>
             The selected pH is used for net charge and pI-related calculations
-            based on residue and terminal pKa values (N-term 8.6, C-term 3.6; standard side-chain pKa set).<br>
+            based on residue and terminal pKa values (Calculated using IPC 2.0, Bjellqvist, and EMBOSS scales for maximum accuracy).<br>
             Adjust the slider to see how net charge and charge-dependent results vary with pH.
           </span>
 
@@ -162,8 +162,45 @@
                 <tr><th colspan="2">Basic Properties</th></tr>
                 <tr><td>Terminus</td><td id="result-termini">-</td></tr>
                 <tr><td>Peptide Length</td><td id="result-length">-</td></tr>
-                <tr><td>Isoelectric Point (pI)</td><td id="result-pi">-</td></tr>
-                <tr><td>Net Charge at Selected pH (<span id="displayed-pH">7.0</span>)</td><td id="result-charge">-</td></tr>
+                <tr style="background-color: #f0f8ff;">
+                  <td>
+                    <strong>
+                      <a href="https://peptidechemistry.org/peptide-pi-calculation-pka-scales/" 
+                        target="_blank" 
+                        rel="noopener" 
+                        style="color: #1e90ff; text-decoration: none; font-weight: bold;">
+                        Isoelectric Point (pI)
+                      </a> 
+                      - IPC 2.0
+                    </strong>
+                  </td>
+                  <td id="result-pi" style="font-weight: bold; color: #EB5247;">-</td>
+                </tr>
+                <tr style="font-size: 0.9em; color: #555;">
+                  <td style="padding-left: 20px;">└ Bjellqvist scale</td>
+                  <td id="res-pI-bjellqvist" style="font-weight: bold; color: #1E90FF;">-</td>
+                </tr>
+                <tr style="font-size: 0.9em; color: #555;">
+                  <td style="padding-left: 20px;">└ EMBOSS scale</td>
+                  <td id="res-pI-emboss" style="font-weight: bold; color: #F1C40F;">-</td>
+                </tr>
+                <tr>
+                <tr style="font-size: 0.9em; color: #555;">
+                  <td style="padding-left: 20px;">└ Lehninger</td>
+                  <td id="res-pI-lehninger" style="font-weight: bold; color: #2ECC71;">-</td>
+                </tr>
+                <tr style="display: none;"><td id="res-pI-ipc2"></td></tr>
+                <tr>
+                  <td>
+                    <a href="https://peptidechemistry.org/peptide-pi-calculation-pka-scales/" 
+                      target="_blank" 
+                      rel="noopener" 
+                      style="color: #1e90ff; text-decoration: none; font-weight: bold;">
+                      Net Charge at Selected pH (<span id="displayed-pH">7.0</span>)
+                    </a>
+                  </td>
+                  <td id="result-charge">-</td>
+                </tr>
                 <tr>
                   <td>
                     <a href="https://peptidechemistry.org/gravy-score-in-peptides/" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
@@ -318,7 +355,7 @@
               resources page
           </a>.
       </p>
-      <p style="font-size: 14px; color: #777;">Peptalyzer™ Version: <span id="appVersion">1.1.0</span></p>
+      <p style="font-size: 14px; color: #777;">Peptalyzer™ Version: <span id="appVersion">1.2.0</span></p>
   </footer>
 
 </body>

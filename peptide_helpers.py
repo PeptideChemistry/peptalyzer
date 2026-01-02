@@ -23,15 +23,45 @@ AVERAGE_MASS = {
 # 🧬 Valid standard amino acids
 VALID_AMINO_ACIDS = set(MONOISOTOPIC_MASS.keys())
 
-# ⚛️ Residue-specific ionizable pKa values for net charge/pI
-AA_PROPERTIES = {
-    'D': {'pKa': 3.86,  'acidic': True},
-    'E': {'pKa': 4.25,  'acidic': True},
-    'C': {'pKa': 8.33,  'acidic': True},
-    'Y': {'pKa': 10.07, 'acidic': True},
-    'H': {'pKa': 6.00,  'basic': True},
-    'K': {'pKa': 10.53, 'basic': True},
-    'R': {'pKa': 12.48, 'basic': True}
+# 🔢 Master pKa scales for side chains and termini
+PKA_SCALES = {
+    "IPC2_peptide": {
+        "N_term": 7.947, "C_term": 2.977,
+        "D": 3.969, "E": 4.507, "C": 9.439, 
+        "Y": 9.153, "H": 6.439, "K": 8.165, "R": 11.493
+    },
+    "Bjellqvist": {
+        "N_term": 7.5, "C_term": 3.55,
+        "D": 4.05, "E": 4.45, "C": 9.0, 
+        "Y": 10.0, "H": 5.98, "K": 10.0, "R": 12.0
+    },
+    "EMBOSS": {
+        "N_term": 8.6, "C_term": 3.6,
+        "D": 3.9, "E": 4.1, "C": 8.5, 
+        "Y": 10.1, "H": 6.5, "K": 10.8, "R": 12.5
+    },
+    "Lehninger": {
+        "N_term": 9.69,
+        "C_term": 2.34,
+        "D": 3.86,
+        "E": 4.25,
+        "C": 8.33,
+        "Y": 10.07,
+        "H": 6.00,
+        "K": 10.53,
+        "R": 12.48
+    }
+}
+
+# Tells the code WHICH amino acids are ionizable and what type they are
+IONIZABLE_RESIDUES = {
+    'D': 'acidic',
+    'E': 'acidic',
+    'C': 'acidic',
+    'Y': 'acidic',
+    'H': 'basic',
+    'K': 'basic',
+    'R': 'basic'
 }
 
 # ⚛️ N-terminal modifications and their charge behavior
@@ -40,21 +70,13 @@ N_TERM_MODIFICATIONS = {
         "monoisotopic_mass_shift": 1.00782,
         "average_mass_shift": 1.00794,
         "label": "H- (free amine)",
-        "ionizable_groups": [
-            {
-                "pKa": 8.6,
-                "acidic": False,
-                "charge": 1
-            }
-        ],
-        "atomic_composition": {'H': 1}  # Free amine group (NH2 is in amino acid formulas)
+        "atomic_composition": {'H': 1}
     },
     "Ac": {
         "monoisotopic_mass_shift": 43.01838,
         "average_mass_shift": 43.04522,
         "label": "Ac- (acetylated)",
-        "ionizable_groups": [],
-        "atomic_composition": {'C': 2, 'H': 3, 'O': 1}  # CH3-CO group
+        "atomic_composition": {'C': 2, 'H': 3, 'O': 1}
     }
 }
 
@@ -64,22 +86,13 @@ C_TERM_MODIFICATIONS = {
         "monoisotopic_mass_shift": 17.00273,
         "average_mass_shift": 17.00734,
         "label": "-OH (carboxylic acid)",
-        "ionizable_groups": [
-            {
-                "pKa": 3.6,
-                "acidic": True,
-                "charge": 1
-            }
-        ],
         "atomic_composition": {'O': 1, 'H': 1}
     },
     "NH2": {
         "monoisotopic_mass_shift": 16.01872,
         "average_mass_shift": 16.02262,
         "label": "-NH2 (amide)",
-        "ionizable_groups": [],
         "atomic_composition": {'N': 1, 'H': 2}
-
     }
 }
 
@@ -226,19 +239,28 @@ def validate_sequence(sequence):
     return sequence
 
 # ⚡ Computes net charge at specified pH with terminal mods
-def calculate_net_charge(sequence, pH, n_term="H", c_term="OH"):
-    sequence = validate_sequence(sequence)
-    aa_counts = Counter(sequence)
-    charge = 0.0
-    charge += apply_terminal_modification_charge(pH, N_TERM_MODIFICATIONS[n_term], is_n_term=True)
-    charge += apply_terminal_modification_charge(pH, C_TERM_MODIFICATIONS[c_term], is_n_term=False)
-    for aa, props in AA_PROPERTIES.items():
-        count = aa_counts.get(aa, 0)
-        if props.get("basic"):
-            charge += count * (10 ** props["pKa"]) / (10 ** props["pKa"] + 10 ** pH)
-        if props.get("acidic"):
-            charge -= count * (10 ** pH) / (10 ** props["pKa"] + 10 ** pH)
-    return charge
+def calculate_net_charge(sequence, pH, n_term_type="H", c_term_type="OH", scale_name="IPC2_peptide"):
+    pka_set = PKA_SCALES.get(scale_name, PKA_SCALES["IPC2_peptide"])
+    net_charge = 0.0
+
+    # 1. Side Chain Charges Only
+    for aa in sequence:        
+        pKa = pka_set.get(aa)
+        if pKa is not None:
+            # Side chains only (pKa < 7 is D, E, Y; pKa > 7 is H, K, R)
+            if aa in ['D', 'E', 'Y']:
+                net_charge -= 1 / (1 + 10**(pKa - pH))
+            elif aa in ['H', 'K', 'R']:
+                net_charge += 1 / (1 + 10**(pH - pKa))
+
+    # 2. Strict Terminal Charges
+    if n_term_type == "H":
+        net_charge += 1 / (1 + 10**(pH - pka_set["N_term"]))
+    
+    if c_term_type == "OH":
+        net_charge -= 1 / (1 + 10**(pka_set["C_term"] - pH))
+
+    return net_charge
 
 # 🧮 Computes average molecular weight with terminal mods
 def calculate_average_mass(sequence, n_term="H", c_term="OH"):
@@ -434,30 +456,34 @@ def apply_terminal_modification_charge(pH, mod, is_n_term):
     return total
 
 # ⚖️ Estimates isoelectric point via bisection method
-def calculate_isoelectric_point(sequence, n_term="H", c_term="OH"):
+def calculate_isoelectric_point(sequence, n_term="H", c_term="OH", scale_name="IPC2_peptide"):
     """
-    Estimate the isoelectric point (pI) of a peptide sequence using bisection.
-    Args:
-        sequence (str): Peptide sequence (1-letter code).
-        n_term (str): N-terminal modification key.
-        c_term (str): C-terminal modification key.
-    Returns:
-        float: Estimated isoelectric point (pI).
+    Calculates the isoelectric point of a peptide using the specified pKa scale.
     """
-    sequence = validate_sequence(sequence)
-    low = 0.0
-    high = 14.0
-    tolerance = 0.001
+    low = 0.000
+    high = 14.000
+    # Bisection method search
     for _ in range(100):
         mid = (low + high) / 2
-        charge = calculate_net_charge(sequence, pH=mid, n_term=n_term, c_term=c_term)
-        if abs(charge) < tolerance:
-            return round(mid, 3)
+        # Pass the scale_name to the net charge function
+        charge = calculate_net_charge(sequence, mid, n_term, c_term, scale_name=scale_name)
         if charge > 0:
             low = mid
         else:
             high = mid
-    return round(mid, 3)  # Fallback if tolerance not reached
+            
+    return round(mid, 3)
+
+def calculate_all_pis(sequence, n_term="H", c_term="OH"):
+    """
+    Calculates the isoelectric point using all three available scales.
+    Returns a dictionary of results.
+    """
+    results = {}
+    for scale in PKA_SCALES.keys():
+        results[scale] = calculate_isoelectric_point(sequence, n_term, c_term, scale_name=scale)
+    
+    return results
 
 # 🧮 Counts the number of each amino acid in the sequence
 def count_amino_acids(sequence):

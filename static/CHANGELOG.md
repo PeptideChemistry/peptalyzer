@@ -4,6 +4,31 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.0] - 2026-01-02
+### Added
+- **Multi-Scale pI Comparison**
+  - Integrated support for four distinct pKa scales: **IPC 2.0** (default), **Bjellqvist**, **EMBOSS**, and **Lehninger**.
+  - Enabled side-by-side comparison of results to facilitate alignment with varied laboratory and synthesis standards.
+- **Educational Integration**
+  - Added direct links from the dashboard results (pI and Net Charge) to the comprehensive guide on **Peptide pI Calculation** for better user context and theoretical transparency.
+
+### Improved
+- **Isoelectric Point (pI) Accuracy**
+  - Enhanced the bisection algorithm to support highly acidic modified peptides by extending the search range down to **pH 0.0**.
+  - Decoupled side-chain ionization from terminal ionization logic to improve accuracy for modified sequences.
+- **Charge Calculation Logic**
+  - Refined terminal handling for **Acetylation (Ac-)** and **Amidation (-NH2)** to ensure correct charge suppression in synthetic peptides.
+
+### Fixed
+- **The "0.000 pI" Bug**
+  - Resolved a calculation error where N-terminally modified acidic sequences (e.g., Ac-HE) incorrectly defaulted to a pI of 0.000.
+- **Data Synchronization**
+  - Fixed a state-management issue that prevented comparison scales from updating in real-time on the dashboard.
+- **UI/UX Refinements**
+  - Corrected table layout breaks and ensured responsive rendering of nested results on mobile and desktop views.
+
+---
+
 ## [1.1.0] - 2025-09-21
 ### Added
 - **Amino Acid Composition**

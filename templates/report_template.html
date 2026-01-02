@@ -28,8 +28,15 @@
   <table>
     <tbody>
       <tr><td>Peptide Length</td><td>{{ data.length }}</td></tr>
-      <tr><td>Isoelectric Point (pI)</td><td>{{ data.isoelectric_point }}</td></tr>
-      <tr><td>Net Charge at Selected pH</td><td>{{ data.charge_at_pH }}</td></tr>
+      <tr style="background-color: #f0f8ff; font-weight: bold;">
+        <td>Isoelectric Point (pI) - IPC 2.0</td>
+        <td>{{ data.isoelectric_point }}</td>
+      </tr>
+      <tr><td style="padding-left: 20px;">└ Bjellqvist scale</td><td>{{ data.pi_scales.bjellqvist }}</td></tr>
+      <tr><td style="padding-left: 20px;">└ EMBOSS scale</td><td>{{ data.pi_scales.emboss }}</td></tr>
+      <tr><td style="padding-left: 20px;">└ Lehninger scale</td><td>{{ data.pi_scales.lehninger }}</td></tr>
+      
+      <tr><td>Net Charge at Selected pH ({{ data.selected_pH }})</td><td>{{ data.charge_at_pH }}</td></tr>
       <tr><td>GRAVY Score</td><td>{{ data.gravy_value }} ({{ data.gravy_classification }})</td></tr>
       <tr><td>Peptide Polarity</td><td>{{ data.peptide_polarity }}</td></tr>
       <tr><td>Molecular Formula</td><td>{{ data.molecular_formula.formatted }}</td></tr>
@@ -64,12 +71,22 @@
 <section class="page-break">
   <h2>Amino Acid Counts</h2>
   <table>
-    <thead><tr><th>Amino Acid</th><th>Count</th></tr></thead>
+    <thead>
+      <tr>
+        <th>Amino Acid</th>
+        <th>Count</th>
+        <th>Percent (%)</th>
+      </tr>
+    </thead>
     <tbody>
-      {% for aa, count in data.amino_acid_counts.items() %}
-      <tr><td>{{ aa }}</td><td>{{ count }}</td></tr>
-      {% endfor %}
-    </tbody>
+        {% for aa, info in data.amino_acid_counts.items() %}
+        <tr>
+          <td>{{ aa }}</td>
+          <td>{{ info.count }}</td>
+          <td>{{ info.percent }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
   </table>
 </section>
 
@@ -93,13 +110,8 @@
   </div>
 </section>
 
-<section class="page-break">
-  <h2>Scientist Notes:</h2>
-  <p><em>This space intentionally left blank for manual comments or notes.</em></p>
-</section>
-
 <footer class="report-footer">
-  <p>Peptalyzer™ Version: 1.0.0</p>
+  <p>Peptalyzer™ Version: 1.2.0</p>
   <p><a href="https://peptidechemistry.org/contact/">Contact Support</a> | <a href="https://peptidechemistry.org/peptalyzer/resources">Resources</a></p>
   <p>© 2025 • Peptide Chemistry</p>
 </footer>

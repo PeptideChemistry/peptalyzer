@@ -55,22 +55,43 @@ def generate_hopp_woods_plot(x, y_hw, colors, ylabel="Hydropathy Index (Hopp-Woo
     return save_plot_to_base64()
 
 # 📈 Net Charge vs pH Plot
-def generate_net_charge_plot(ph_values, net_charges, pI):
+# 📈 Multi-Scale Net Charge vs pH Plot
+def generate_net_charge_plot(ph_values, charges_dict, pI_ipc2):
     """
-    Generates a Net Charge vs pH plot and returns base64 string.
+    Generates a multi-line Net Charge vs pH plot using brand colors.
+    charges_dict should look like: {'ipc2': [...], 'bjellqvist': [...], 'emboss': [...]}
     """
-    plt.figure(figsize=(7.5, 4), facecolor='none')  # Slightly taller plot for balance
+    plt.figure(figsize=(7.5, 4), facecolor='none')
     plt.gca().patch.set_alpha(0)
-    plt.plot(ph_values, net_charges, color='#1e90ff', linewidth=2)  # Updated to site blue
-    plt.axhline(0, color='#333333', linewidth=0.8)
-    plt.axvline(pI, color='#333333', linestyle='--', linewidth=0.8)
-    plt.text(pI + 0.2, 0.5, f"pI ≈ {pI}", fontsize=9, color='#333333')
-    plt.xlabel('pH', fontsize=11)
-    plt.ylabel('Net Charge', fontsize=11)
-    plt.xticks(fontsize=10)
-    plt.yticks(fontsize=10)
-    plt.grid(True, linestyle=':', linewidth=0.5, color='#cccccc')  # Softer gridlines
 
+    # 1. Plot each scale with brand colors
+    # Primary: IPC 2.0 (Red)
+    plt.plot(ph_values, charges_dict['ipc2'], color='#EB5247', linewidth=2.5, label='IPC 2.0')
+    
+    # Secondary: Bjellqvist (Blue)
+    plt.plot(ph_values, charges_dict['bjellqvist'], color='#1E90FF', linewidth=1.5, label='Bjellqvist', alpha=0.8)
+    
+    # Accent/Element: EMBOSS (Yellow)
+    plt.plot(ph_values, charges_dict['emboss'], color='#F1C40F', linewidth=1.5, label='EMBOSS', alpha=0.8)
+
+    # Accent/Element: Lehninger (Green)
+    plt.plot(ph_values, charges_dict['lehninger'], color='#2ECC71', linewidth=1.5, label='Lehninger', alpha=0.8)
+
+    # 2. Add Reference Lines
+    plt.axhline(0, color='#333333', linewidth=1.0) # Zero line
+    plt.axvline(pI_ipc2, color='#EB5247', linestyle='--', linewidth=0.8, alpha=0.6) # pI marker
+    
+    # 3. Text and Labels
+    plt.text(pI_ipc2 + 0.2, 0.5, f"pI (IPC2) ≈ {pI_ipc2}", fontsize=9, color='#EB5247', fontweight='bold')
+    plt.xlabel('pH', fontsize=11, color='#333333')
+    plt.ylabel('Net Charge', fontsize=11, color='#333333')
+    
+    # 4. Legend styling
+    plt.legend(loc='upper right', fontsize=9, frameon=True, facecolor='#F9F9F9', edgecolor='#333333')
+    
+    plt.grid(True, linestyle=':', linewidth=0.5, color='#cccccc')
+
+    # Spines/Border
     for spine in plt.gca().spines.values():
         spine.set_linewidth(1.5)
         spine.set_color('#333333')

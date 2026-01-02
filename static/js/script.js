@@ -106,7 +106,7 @@ interInput.addEventListener("input", disableExportButtons);
     document.getElementById("result-inter-disulfide-bonds").textContent = data.inter_disulfide_bonds;
     document.getElementById("result-peptide-state").textContent = data.peptide_state;
     document.getElementById("result-termini").innerHTML = data.terminal_modifications;
-    document.getElementById("result-pi").textContent = data.isoelectric_point.toFixed(2);
+    document.getElementById("result-pi").textContent = data.isoelectric_point.toFixed(3);
     document.getElementById("result-charge").textContent = data.charge_at_pH.toFixed(2);
     document.getElementById("result-gravy").textContent = data.gravy_value.toFixed(2);
     document.getElementById("result-gravy-classification").textContent = data.gravy_classification;
@@ -118,6 +118,10 @@ interInput.addEventListener("input", disableExportButtons);
     document.getElementById("result-aromaticity").textContent = data.aromaticity.value;
     document.getElementById("result-instability").textContent = data.instability_index.value;
     document.getElementById("result-extinction").textContent = data.extinction_coefficient.adjusted + ' ' + data.extinction_coefficient.unit;
+    document.getElementById('res-pI-ipc2').textContent = data.pI_ipc2.toFixed(3);
+    document.getElementById('res-pI-bjellqvist').textContent = data.pI_bjellqvist.toFixed(3);
+    document.getElementById('res-pI-emboss').textContent = data.pI_emboss.toFixed(3);
+    document.getElementById('res-pI-lehninger').textContent = data.pI_lehninger.toFixed(3);
 
     const formulaWithSubscripts = data.molecular_formula.formatted.replace(/(\d+)/g, "<sub>$1</sub>");
     document.getElementById("result-formula").innerHTML = formulaWithSubscripts;
@@ -200,7 +204,8 @@ interInput.addEventListener("input", disableExportButtons);
       `;
       tbody.appendChild(tr);
     }
-  
+    attachAATableSortHandlers(table);
+   }
   function ensureAAHeaderHasPercent(thead) {
   if (!thead) return;
   const headerRow = thead.querySelector("tr");
@@ -255,11 +260,6 @@ function attachAATableSortHandlers(table) {
   });
 }
 
-
-    // add / refresh header click handlers for sorting
-    attachAATableSortHandlers(table);
-  }
-
   exportCsvBtn.addEventListener("click", () => {
     const rows = document.querySelectorAll("#resultsTable tr");
     let csvContent = "";
@@ -291,6 +291,12 @@ function attachAATableSortHandlers(table) {
 
     calcButton.disabled = true;
     calcButton.textContent = "Calculating...";
+
+    const piIds = ['result-pi', 'res-pI-bjellqvist', 'res-pI-emboss', 'res-pI-lehninger'];
+    piIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = "..."; 
+    });
 
     resetGraphs();
     disableExportButtons();
