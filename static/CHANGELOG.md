@@ -4,6 +4,16 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.0] - 2026-01-05
+### Added
+- **Extinction Coefficient (ε205)**: Added calculation for extinction coefficient at 205 nm to complement the existing 280 nm metric.
+- **Amino Acid Distribution Visualization**: Enhanced the Amino Acid Counts table with a new "Nature & Distribution" column featuring color-coded visual bars representing residue abundance and chemical nature.
+
+### Changed
+- **UI Enhancements**: Added tooltips and direct resource links for Extinction Coefficients.
+- **Color Updates**: Adjusted the color for "Others" (Glycine/Proline) in the distribution visualization for better contrast.
+- **Reporting**: Updated the PDF report to include the new ε205 metric and the enhanced amino acid distribution table.
+
 ## [1.3.0] - 2026-01-05
 ### Added
 - **Neutral pH Aromaticity**: Implemented a new sub-metric for Aromaticity that accounts for Histidine (His) contribution at neutral pH.

@@ -21,11 +21,13 @@ from peptide_helpers import (
     calculate_charge_distribution,
     format_molecular_formula,
     calculate_extinction_coefficient,
+    calculate_epsilon_205,
     calculate_all_pis,
     N_TERM_MODIFICATIONS,
     C_TERM_MODIFICATIONS,
     HYDROPATHY_HOPP_WOODS,
     RESIDUE_COLORS,
+    RESIDUE_CATEGORIES,
 )
 
 from plot_helpers import (
@@ -61,7 +63,7 @@ CALCULATION_CACHE = {}
 @peptalyzer.route("/")
 def index():
     """Render the main app interface."""
-    return render_template("index.html")
+    return render_template("index.html", current_year=datetime.now().year)
 
 def process_peptide_calculation(data: dict) -> dict:
     """
@@ -157,6 +159,7 @@ def process_peptide_calculation(data: dict) -> dict:
 
     # Extinction coefficient
     extinction_data = calculate_extinction_coefficient(sequence, total_disulfide_bonds, peptide_units)
+    epsilon_205 = calculate_epsilon_205(sequence)
 
     aromaticity = analysis.aromaticity()
 
@@ -185,7 +188,16 @@ def process_peptide_calculation(data: dict) -> dict:
     molecular_formula['formatted'] = format_molecular_formula(molecular_formula['raw'])
 
     total_charge_residues = charge_distribution["acidic_count"] + charge_distribution["basic_count"]
-    amino_acid_counts = count_amino_acids(sequence)
+    
+    # Enrich amino acid counts with metadata for the frontend table
+    raw_counts = count_amino_acids(sequence)
+    amino_acid_counts = {}
+    for aa, count in raw_counts.items():
+        amino_acid_counts[aa] = {
+            "count": count,
+            "category": RESIDUE_CATEGORIES.get(aa, "Unknown"),
+            "color": RESIDUE_COLORS.get(aa, "#333333")
+        }
 
     n_term_full = format_subscripts(N_TERM_MODIFICATIONS.get(n_term, {}).get("label", n_term))
     c_term_full = format_subscripts(C_TERM_MODIFICATIONS.get(c_term, {}).get("label", c_term))
@@ -221,6 +233,7 @@ def process_peptide_calculation(data: dict) -> dict:
                 "adjusted": extinction_data["extinction_coefficient"],
                 "unit": extinction_data["unit"]
             },
+        "extinction_coefficient_205": {"value": epsilon_205, "unit": "M⁻¹·cm⁻¹"},
         "aromaticity": {
             "value": round(aromaticity, 4),
             "value_his": round(aromaticity_his, 4),
@@ -241,6 +254,7 @@ def process_peptide_calculation(data: dict) -> dict:
         "total_charge_residues": total_charge_residues,
         "peptide_polarity": peptide_polarity,
         "sequence_valid": True,
+        "current_year": datetime.now().year,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "debug_info": {
             "ph_values": ph_values,

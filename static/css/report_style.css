@@ -110,3 +110,7 @@ footer.report-footer {
   margin-top: 30px;
   page-break-before: always;
 }
+
+.distribution-bar {
+  background: linear-gradient(to right, var(--dist-color) var(--dist-pct), transparent var(--dist-pct));
+}

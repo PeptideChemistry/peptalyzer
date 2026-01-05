@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Peptalyzer v1.3.0 loaded");
+  console.log("Peptalyzer v1.4.0 loaded");
   // ====== DOM Elements ======
   const form = document.getElementById("calcForm");
   const phInput = document.getElementById("phInput");
@@ -141,6 +141,7 @@ interInput.addEventListener("input", disableExportButtons);
 
     document.getElementById("result-instability").textContent = data.instability_index.value;
     document.getElementById("result-extinction").textContent = data.extinction_coefficient.adjusted + ' ' + data.extinction_coefficient.unit;
+    document.getElementById("result-extinction-205").textContent = data.extinction_coefficient_205.value + ' ' + data.extinction_coefficient_205.unit;
     document.getElementById('res-pI-ipc2').textContent = data.pI_ipc2.toFixed(3);
     document.getElementById('res-pI-bjellqvist').textContent = data.pI_bjellqvist.toFixed(3);
     document.getElementById('res-pI-emboss').textContent = data.pI_emboss.toFixed(3);
@@ -199,7 +200,7 @@ interInput.addEventListener("input", disableExportButtons);
     if (!counts || Object.keys(counts).length === 0) {
       const row = document.createElement("tr");
       const cell = document.createElement("td");
-      cell.colSpan = 3; // now 3 columns
+      cell.colSpan = 4; // now 4 columns
       cell.textContent = "No amino acids found.";
       row.appendChild(cell);
       tbody.appendChild(row);
@@ -207,20 +208,24 @@ interInput.addEventListener("input", disableExportButtons);
     }
 
     // total length for percent calculation (one decimal)
-    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    const total = Object.values(counts).reduce((a, b) => a + b.count, 0);
 
     // default alphabetical order (A→Z)
     const entries = Object.entries(counts).sort((a, b) => a[0].localeCompare(b[0]));
 
-    for (const [aa, count] of entries) {
+    for (const [aa, info] of entries) {
+      const count = info.count;
       const pct = ((count / total) * 100).toFixed(1);
+      const category = info.category;
+      const color = info.color;
 
       const tr = document.createElement("tr");
       // store raw values for sorting
       tr.innerHTML = `
         <td data-type="str">${aa}</td>
         <td data-type="num" data-value="${count}">${count}</td>
-        <td data-type="num" data-value="${pct}">${pct}</td>
+        <td data-type="num" data-value="${pct}">${pct}%</td>
+        <td data-type="str" style="background: linear-gradient(to right, ${color} ${pct}%, transparent ${pct}%);">${category}</td>
       `;
       tbody.appendChild(tr);
     }

@@ -53,7 +53,8 @@
       <tr><td>Intramolecular SS Bonds</td><td>{{ data.intra_disulfide_bonds }}</td></tr>
       <tr><td>Intermolecular SS Bonds</td><td>{{ data.inter_disulfide_bonds }}</td></tr>
       <tr><td>Peptide State</td><td>{{ data.peptide_state }}</td></tr>
-      <tr><td>Extinction Coefficient</td><td>{{ data.extinction_coefficient.adjusted }} {{ data.extinction_coefficient.unit }}</td></tr>
+      <tr><td>Extinction Coefficient (ε<sub>280</sub>)</td><td>{{ data.extinction_coefficient.adjusted }} {{ data.extinction_coefficient.unit }}</td></tr>
+      <tr><td>Extinction Coefficient (ε<sub>205</sub>)</td><td>{{ data.extinction_coefficient_205.value }} {{ data.extinction_coefficient_205.unit }}</td></tr>
       <tr><td>Aromaticity</td><td>{{ data.aromaticity.value }}</td></tr>
       <tr style="font-size: 0.9em; color: #555;">
         <td style="padding-left: 20px;">└ Including Histidine (Neutral pH)</td>
@@ -86,14 +87,17 @@
         <th>Amino Acid</th>
         <th>Count</th>
         <th>Percent (%)</th>
+        <th>Nature & Distribution</th>
       </tr>
     </thead>
     <tbody>
-        {% for aa, count in data.amino_acid_counts.items()|sort %}
+        {% for aa, info in data.amino_acid_counts.items()|sort %}
         <tr>
           <td>{{ aa }}</td>
-          <td>{{ count }}</td>
-          <td>{{ "%.1f"|format(count / data.length * 100) }}%</td>
+          <td>{{ info.count }}</td>
+          {% set pct = (info.count / data.length * 100)|round(1) %}
+          <td>{{ pct }}%</td>
+          <td class="distribution-bar" style="--dist-color: {{ info.color }}; --dist-pct: {{ pct }}%;">{{ info.category }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -121,9 +125,9 @@
 </section>
 
 <footer class="report-footer">
-  <p>Peptalyzer™ Version: 1.3.0</p>
+  <p>Peptalyzer™ Version: 1.4.0</p>
   <p><a href="https://peptidechemistry.org/contact/">Contact Support</a> | <a href="https://peptidechemistry.org/peptalyzer/resources">Resources</a></p>
-  <p>© 2025 • Peptide Chemistry</p>
+  <p>© {{ data.current_year }} • Peptide Chemistry</p>
 </footer>
 
 </body>

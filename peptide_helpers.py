@@ -174,8 +174,19 @@ RESIDUE_COLORS = {
     'N': '#228B22',  # Polar - Forest Green
     'Q': '#228B22',  # Polar - Forest Green
     'C': '#ffd700',  # Cysteine - Gold
-    'G': '#333333',  # Others - Neutral Gray
-    'P': '#333333'   # Others - Neutral Gray
+    'G': '#808080',  # Others - Medium Gray
+    'P': '#808080'   # Others - Medium Gray
+}
+
+# 🏷️ Amino acid categories for UI display
+RESIDUE_CATEGORIES = {
+    'D': 'Acidic', 'E': 'Acidic',
+    'R': 'Basic', 'K': 'Basic', 'H': 'Basic',
+    'F': 'Aromatic', 'W': 'Aromatic', 'Y': 'Aromatic',
+    'A': 'Aliphatic', 'I': 'Aliphatic', 'L': 'Aliphatic', 'V': 'Aliphatic', 'M': 'Aliphatic',
+    'S': 'Polar', 'T': 'Polar', 'N': 'Polar', 'Q': 'Polar',
+    'C': 'Cysteine',
+    'G': 'Others', 'P': 'Others'
 }
 
 # ================================
@@ -514,3 +525,40 @@ def calculate_extinction_coefficient(sequence: str, total_disulfide_bonds: int, 
         "extinction_coefficient": extinction_total,
         "unit": "M⁻¹·cm⁻¹"
     }
+
+def calculate_epsilon_205(sequence: str) -> float:
+    """
+    Calculates the extinction coefficient of a peptide at 205 nm.
+    """
+    # Step A: Clean the input sequence
+    sequence = sequence.strip().upper()
+
+    # 1. Constants (Molar Extinction Coefficients at 205 nm)
+    E_SIDECHAIN = {
+        'W': 20400, 'F': 8600, 'Y': 6080, 'H': 5200, 'M': 1830, 'R': 1350,
+        'A': 0, 'D': 0, 'N': 0, 'C': 0, 'E': 0, 'Q': 0, 'G': 0,
+        'I': 0, 'L': 0, 'K': 0, 'P': 0, 'S': 0, 'T': 0, 'V': 0
+    }
+    E_BACKBONE = 2780
+
+    # Step B: Calculate num_bonds
+    length = len(sequence)
+    if length <= 1:
+        num_bonds = 0
+    else:
+        num_bonds = length - 1
+
+    # Step C: Calculate backbone_absorbance
+    backbone_absorbance = num_bonds * E_BACKBONE
+
+    # Step D: Loop through every amino acid
+    sidechain_absorbance = 0
+    for aa in sequence:
+        if aa in E_SIDECHAIN:
+            sidechain_absorbance += E_SIDECHAIN[aa]
+
+    # Step E: total_epsilon
+    total_epsilon = backbone_absorbance + sidechain_absorbance
+
+    # 3. Output
+    return round(float(total_epsilon), 2)
