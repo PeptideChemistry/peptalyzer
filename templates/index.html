@@ -18,7 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
   <!-- Custom stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('peptalyzer.static', filename='css/style.css') }}?v=1.2.2">
+  <link rel="stylesheet" href="{{ url_for('peptalyzer.static', filename='css/style.css') }}?v=1.3.0">
 </head>
 
 <body>
@@ -186,7 +186,7 @@
                 </tr>
                 <tr>
                 <tr style="font-size: 0.9em; color: #555;">
-                  <td style="padding-left: 20px;">└ Lehninger</td>
+                  <td style="padding-left: 20px;">└ Lehninger scale</td>
                   <td id="res-pI-lehninger" style="font-weight: bold; color: #2ECC71;">-</td>
                 </tr>
                 <tr style="display: none;"><td id="res-pI-ipc2"></td></tr>
@@ -221,6 +221,22 @@
                 <tr><td>Intermolecular SS Bonds</td><td id="result-inter-disulfide-bonds">-</td></tr>
                 <tr><td>Peptide State</td><td id="result-peptide-state">-</td></tr>
                 <tr><td>Extinction Coefficient</td><td id="result-extinction">-</td></tr>
+                <tr>
+                  <td>
+                    <a href="https://peptidechemistry.org/aromaticity-index/" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
+                      Aromaticity
+                    </a>
+                  </td>
+                  <td id="result-aromaticity">-</td>
+                </tr>
+                <tr style="font-size: 0.9em; color: #555;">
+                  <td style="padding-left: 20px;">└ 
+                    <a href="https://peptidechemistry.org/aromaticity-index/#histidine-at-neutral-ph" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
+                      Including Histidine (Neutral pH)
+                    </a>
+                  </td>
+                  <td id="result-aromaticity-his">-</td>
+                </tr>
                 <tr><td>Molecular Formula</td><td id="result-formula">-</td></tr>
 
                 <!-- Charge Distribution -->
@@ -229,8 +245,8 @@
                 <tr><td>Basic Residues (R, K, H)</td><td id="result-basic-count">-</td></tr>
                 <tr><td>Total Charged Residues</td><td id="result-total-charged">-</td></tr>
 
-                <!-- Indices -->
-                <tr><th colspan="2">Indices</th></tr>
+                <!-- Bio-Predictive Metrics -->
+                <tr><th colspan="2">Bio-Predictive Metrics</th></tr>
                 <tr>
                   <td>
                     <a href="https://peptidechemistry.org/boman-index-peptides/" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
@@ -239,9 +255,22 @@
                   </td>
                   <td id="result-boman">-</td>
                 </tr>
-                <tr><td>Aliphatic Index</td><td id="result-aliphatic">-</td></tr>
-                <tr><td>Aromaticity</td><td id="result-aromaticity">-</td></tr>
-                <tr><td>Instability Index</td><td id="result-instability">-</td></tr>
+                <tr>
+                  <td>
+                    <a href="https://peptidechemistry.org/aliphatic-index/" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
+                      Aliphatic Index
+                    </a>
+                  </td>
+                  <td id="result-aliphatic">-</td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://peptidechemistry.org/instability-index/" target="_blank" rel="noopener" style="color: #1e90ff; text-decoration: none; font-weight: bold;">
+                      Instability Index
+                    </a>
+                  </td>
+                  <td id="result-instability">-</td>
+                </tr>
 
                 <!-- Secondary Structure -->
                 <tr><th colspan="2">Secondary Structure</th></tr>
@@ -339,7 +368,7 @@
   </main>
 
   <!-- Link to JavaScript file controlling form submission and dynamic updates -->
-  <script src="{{ url_for('peptalyzer.static', filename='js/script.js') }}?v=1.2.2"></script>
+  <script src="{{ url_for('peptalyzer.static', filename='js/script.js') }}?v=1.3.0"></script>
 
   <!-- ===== Footer Section ===== -->
   <footer style="margin-top: 50px; text-align: center; padding: 20px; font-family: 'Roboto', sans-serif; color: #333;">
@@ -355,7 +384,7 @@
               resources page
           </a>.
       </p>
-      <p style="font-size: 14px; color: #777;">Peptalyzer™ Version: <span id="appVersion">1.2.2</span></p>
+      <p style="font-size: 14px; color: #777;">Peptalyzer™ Version: <span id="appVersion">1.3.0</span></p>
   </footer>
 
 </body>

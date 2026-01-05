@@ -159,6 +159,12 @@ def process_peptide_calculation(data: dict) -> dict:
     extinction_data = calculate_extinction_coefficient(sequence, total_disulfide_bonds, peptide_units)
 
     aromaticity = analysis.aromaticity()
+
+    # Calculate Neutral pH Aromaticity (His-Included)
+    his_count = sequence.count('H')
+    std_aromatic_count = sequence.count('F') + sequence.count('W') + sequence.count('Y')
+    aromaticity_his = (std_aromatic_count + his_count) / len(sequence) if len(sequence) > 0 else 0.0
+
     instability_index = analysis.instability_index()
     gravy_result = calculate_gravy_score(sequence)
     secondary_structure = estimate_secondary_structure(sequence)
@@ -215,7 +221,11 @@ def process_peptide_calculation(data: dict) -> dict:
                 "adjusted": extinction_data["extinction_coefficient"],
                 "unit": extinction_data["unit"]
             },
-        "aromaticity": {"value": round(aromaticity, 4)},
+        "aromaticity": {
+            "value": round(aromaticity, 4),
+            "value_his": round(aromaticity_his, 4),
+            "has_his": his_count > 0
+        },
         "instability_index": {"value": round(instability_index, 2)},
         "gravy_value": gravy_result["value"],
         "intra_disulfide_bonds": intra_disulfide_bonds,

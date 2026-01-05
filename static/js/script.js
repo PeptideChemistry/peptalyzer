@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Peptalyzer v1.2.2 loaded");
+  console.log("Peptalyzer v1.3.0 loaded");
   // ====== DOM Elements ======
   const form = document.getElementById("calcForm");
   const phInput = document.getElementById("phInput");
@@ -130,7 +130,15 @@ interInput.addEventListener("input", disableExportButtons);
     document.getElementById("result-avg-mw").textContent = data.average_mw.toFixed(4) + " Da";
     document.getElementById("result-boman").textContent = data.boman_index;
     document.getElementById("result-aliphatic").textContent = data.aliphatic_index.value + "% (" + data.aliphatic_index.rating + ")";
+    
     document.getElementById("result-aromaticity").textContent = data.aromaticity.value;
+    const aromHisEl = document.getElementById("result-aromaticity-his");
+    if (data.aromaticity.has_his) {
+      aromHisEl.textContent = data.aromaticity.value_his;
+    } else {
+      aromHisEl.textContent = "No His residues";
+    }
+
     document.getElementById("result-instability").textContent = data.instability_index.value;
     document.getElementById("result-extinction").textContent = data.extinction_coefficient.adjusted + ' ' + data.extinction_coefficient.unit;
     document.getElementById('res-pI-ipc2').textContent = data.pI_ipc2.toFixed(3);

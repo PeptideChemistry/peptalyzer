@@ -4,6 +4,17 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.3.0] - 2026-01-05
+### Added
+- **Neutral pH Aromaticity**: Implemented a new sub-metric for Aromaticity that accounts for Histidine (His) contribution at neutral pH.
+
+### Changed
+- **UI/UX Refactoring**: Reorganized the results table to better categorize properties.
+  - Moved "Aromaticity" to the "Molecular Characteristics" section.
+  - Renamed the "Indices" section to "Bio-Predictive Metrics".
+- **Resource Linking**: Added direct links to educational resources for Aromaticity, Aliphatic Index, and Instability Index.
+- **Reporting**: Updated the PDF report template to match the new dashboard layout and include the Histidine-inclusive aromaticity metric.
+
 ## [1.2.2] - 2026-01-02
 ### Fixed
 - **Deployment**: Bumped static asset versions to force browser cache refresh and ensure all users receive the latest JavaScript logic for report generation.
